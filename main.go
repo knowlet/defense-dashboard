@@ -3,7 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/csv"
-	"fmt"
+	"log"
 	"os"
 	"strings"
 	"time"
@@ -25,11 +25,24 @@ func svc() string {
 	return "start"
 }
 
+// quest1
+func quest1() {
+	log.Println("quest1")
+
+}
+
+// quest2
+func quest2() {
+	log.Println("quest2")
+}
+
 func scoring(db *gorm.DB, ticker *time.Ticker, quit chan bool) {
 	for {
 		select {
 		case <-ticker.C:
-			fmt.Println("Tick")
+			go quest1()
+			go quest2()
+
 		case <-quit:
 			ticker.Stop()
 		}
@@ -50,16 +63,18 @@ func menu(db *gorm.DB, quit chan bool) {
 		case prompt.Options[0]: // start/stop service
 			check := false
 			prompt := &survey.Confirm{
-				Message: fmt.Sprintf("Are you sure you want to %s the scoring service?", svc()),
+				Message: "Are you sure you want to " + svc() + " the scoring service?",
 				Default: false,
 			}
 			survey.AskOne(prompt, &check)
 			if check {
 				status = !status
 				if status { // start
+					log.Println("Starting scoring service")
 					ticker := time.NewTicker(5 * time.Second)
 					go scoring(db, ticker, stop)
 				} else { // stop
+					log.Println("Stopping scoring service")
 					stop <- true
 				}
 			}
@@ -74,13 +89,13 @@ func menu(db *gorm.DB, quit chan bool) {
 func seedTeam(db *gorm.DB, path string) {
 	file, err := os.Open(path)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		fmt.Println()
+		log.Println()
 		if scanner.Text() == "" {
 			continue
 		}
@@ -92,14 +107,14 @@ func seedTeam(db *gorm.DB, path string) {
 func seedQuest(db *gorm.DB, path string) {
 	file, err := os.Open(path)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	defer file.Close()
 
 	reader := csv.NewReader(file)
 	raw, err := reader.ReadAll()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	header := []string{} // holds first row (header)
@@ -120,10 +135,18 @@ func seedQuest(db *gorm.DB, path string) {
 }
 
 func main() {
+	// If the file doesn't exist, create it or append to the file
+	file, err := os.OpenFile("verbose.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0640)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// Set log to file
+	log.SetOutput(file)
+
 	// Open the data.db file. It will be created if it doesn't exist.
 	db, err := gorm.Open(sqlite.Open("data.db"), &gorm.Config{})
 	if err != nil {
-		panic("failed to connect database")
+		log.Fatal("failed to connect database")
 	}
 
 	// Migrate the schema
@@ -144,6 +167,7 @@ func main() {
 
 	select {
 	case <-quit: // exit
+		log.Println("Bye")
 		return
 	}
 }
