@@ -2,8 +2,11 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"encoding/csv"
+	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -25,14 +28,55 @@ func svc() string {
 	return "start"
 }
 
-// quest1
-func quest1() {
-	log.Println("quest1")
+// points
+const (
+	plus = 10
+)
 
+// quest1
+func quest1(db *gorm.DB) {
+	type t struct {
+		id       uint
+		ip       string
+		hostname string
+		pass     bool
+	}
+
+	var teams = []t{
+		{1, "127.0.0.1", "example.com", false},
+	}
+
+	for _, team := range teams {
+		go func(team t) {
+			ctx := context.Background()
+			ctx, cancel := context.WithCancel(ctx)
+			req, _ := http.NewRequestWithContext(ctx, "GET", fmt.Sprintf("http://%s:2021", team.ip), nil)
+			req.Host = team.hostname
+			client := &http.Client{}
+			// Timeout: 5 * time.Second,
+			go func() {
+				time.Sleep(time.Second * 5)
+				cancel()
+			}()
+			resp, err := client.Do(req)
+			if err != nil {
+				log.Println(err) // cancel caught
+				return
+			}
+			log.Println(resp.StatusCode)
+			// save to db
+			db.Create(&model.Event{
+				Log:     fmt.Sprintf("#%d: Service alive Team%d score +%d", 1, team.id, plus),
+				Point:   plus,
+				TeamID:  team.id,
+				QuestID: 1,
+			})
+		}(team)
+	}
 }
 
 // quest2
-func quest2() {
+func quest2(db *gorm.DB) {
 	log.Println("quest2")
 }
 
@@ -40,8 +84,8 @@ func scoring(db *gorm.DB, ticker *time.Ticker, quit chan bool) {
 	for {
 		select {
 		case <-ticker.C:
-			go quest1()
-			go quest2()
+			go quest1(db)
+			go quest2(db)
 
 		case <-quit:
 			ticker.Stop()
@@ -64,7 +108,7 @@ func menu(db *gorm.DB, quit chan bool) {
 			check := false
 			prompt := &survey.Confirm{
 				Message: "Are you sure you want to " + svc() + " the scoring service?",
-				Default: false,
+				Default: true,
 			}
 			survey.AskOne(prompt, &check)
 			if check {
