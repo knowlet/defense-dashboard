@@ -1,10 +1,8 @@
 package model
 
-import "gorm.io/gorm"
-
 type Team struct {
-	gorm.Model
-	Name  string `gorm:"uniqueIndex"`
-	Score int
-	Event []Event
+	ID     uint   `gorm:"primarykey"`
+	Name   string `gorm:"uniqueIndex"`
+	Score  int
+	Events []Event
 }

@@ -1,9 +1,7 @@
 package model
 
-import "gorm.io/gorm"
-
 type Quest struct {
-	gorm.Model
-	Name  string `gorm:"uniqueIndex"`
-	Event []Event
+	ID     uint   `gorm:"primarykey"`
+	Name   string `gorm:"uniqueIndex"`
+	Events []Event
 }
