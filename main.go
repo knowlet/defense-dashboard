@@ -23,6 +23,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
+// TODO: add file lock
 var status = false
 
 func svc() string {
@@ -127,6 +128,7 @@ func menu(db *gorm.DB, quit chan bool) {
 				}
 			}
 		case prompt.Options[1]: // view score
+			// TODO: add survey list of teams
 			queryModel := []model.Team{}
 			err := db.Preload(clause.Associations).Find(&queryModel).Error
 			if err != nil {
@@ -146,6 +148,7 @@ func menu(db *gorm.DB, quit chan bool) {
 			}
 			table.Render() // Send output
 		case prompt.Options[2]: // lose points
+			// TODO: add lose points events
 		default: // exit
 			quit <- true
 		}
