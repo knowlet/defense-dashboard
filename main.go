@@ -8,15 +8,19 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/AlecAivazis/survey/v2"
+	"github.com/olekukonko/tablewriter"
 
 	"defense-dashboard/model"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
+	"gorm.io/gorm/logger"
 )
 
 var status = false
@@ -123,8 +127,26 @@ func menu(db *gorm.DB, quit chan bool) {
 				}
 			}
 		case prompt.Options[1]: // view score
+			queryModel := []model.Team{}
+			err := db.Preload(clause.Associations).Find(&queryModel).Error
+			if err != nil {
+				fmt.Println(err)
+				break
+			}
+			table := tablewriter.NewWriter(os.Stdout)
+			table.SetHeader([]string{"Name", "Score"})
+
+			for _, v := range queryModel {
+				// TODO: use sql sum
+				sum := 0
+				for _, s := range v.Events {
+					sum += s.Point
+				}
+				table.Append([]string{v.Name, strconv.Itoa(sum)})
+			}
+			table.Render() // Send output
 		case prompt.Options[2]: // lose points
-		case prompt.Options[3]: // exit
+		default: // exit
 			quit <- true
 		}
 	}
@@ -188,7 +210,9 @@ func main() {
 	log.SetOutput(file)
 
 	// Open the data.db file. It will be created if it doesn't exist.
-	db, err := gorm.Open(sqlite.Open("data.db"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open("data.db"), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 	if err != nil {
 		log.Fatal("failed to connect database")
 	}
