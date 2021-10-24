@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -41,15 +40,11 @@ func News(db *gorm.DB, data []map[string]interface{}) {
 				data := url.Values{}
 				data.Set("MSG", string(message))
 
-				req, _ := http.NewRequest(
+				resp, err := request(
 					http.MethodPost,
 					fmt.Sprintf("http://%s%s", t["ip"], path),
+					t["hostname"].(string),
 					strings.NewReader(data.Encode()))
-				req.Host = t["hostname"].(string)
-				client := &http.Client{
-					Timeout: 10 * time.Second,
-				}
-				resp, err := client.Do(req)
 				if err != nil {
 					log.Println(err) // cancel caught
 					return
