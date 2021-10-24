@@ -19,13 +19,8 @@ import (
 )
 
 func main() {
-	// If the file doesn't exist, create it or append to the file
-	file, err := os.OpenFile("verbose.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0640)
-	if err != nil {
-		log.Fatal(err)
-	}
-	// Set log to file
-	log.SetOutput(file)
+	// Set log to stderr
+	log.SetOutput(os.Stderr)
 
 	// Open the data.db file. It will be created if it doesn't exist.
 	db, err := gorm.Open(sqlite.Open("data.db"), &gorm.Config{
