@@ -12,7 +12,6 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/olekukonko/tablewriter"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 // TODO: add file lock
@@ -56,7 +55,7 @@ func Menu(db *gorm.DB, quit chan bool) {
 		case prompt.Options[1]: // view score
 			// TODO: add survey list of teams
 			queryModel := []model.Team{}
-			err := db.Preload(clause.Associations).Find(&queryModel).Error
+			err := db.Find(&queryModel).Error
 			if err != nil {
 				fmt.Println(err)
 				break
@@ -64,13 +63,16 @@ func Menu(db *gorm.DB, quit chan bool) {
 			table := tablewriter.NewWriter(os.Stdout)
 			table.SetHeader([]string{"Name", "Score"})
 
-			for _, v := range queryModel {
-				// TODO: use sql sum
-				sum := 0
-				for _, s := range v.Events {
-					sum += s.Point
+			for _, t := range queryModel {
+				type result struct {
+					Score int
 				}
-				table.Append([]string{v.Name, strconv.Itoa(sum)})
+				var team result
+				db.Model(&model.Event{}).
+					Select("id, team_id, sum(point) as score").
+					Where("team_id = ?", t.ID).
+					Find(&team)
+				table.Append([]string{t.Name, strconv.Itoa(team.Score)})
 			}
 			table.Render() // Send output
 		case prompt.Options[2]: // lose points
