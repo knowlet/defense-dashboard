@@ -52,7 +52,6 @@ func Menu(db *gorm.DB, quit chan bool) {
 				}
 			}
 		case prompt.Options[1]: // view score
-			// TODO: add survey list of teams
 			queryModel := []model.Team{}
 			err := db.Find(&queryModel).Error
 			if err != nil {
@@ -75,7 +74,59 @@ func Menu(db *gorm.DB, quit chan bool) {
 			}
 			table.Render() // Send output
 		case prompt.Options[2]: // lose points
-			// TODO: add lose points events
+			queryModel := []model.Team{}
+			err := db.Find(&queryModel).Error
+			if err != nil {
+				fmt.Println(err)
+				break
+			}
+
+			// Choose team
+			prompt1 := &survey.Select{
+				Message: "Choose Team:",
+				Options: []string{},
+			}
+			for _, t := range queryModel {
+				prompt1.Options = append(prompt1.Options, t.Name)
+			}
+			team := ""
+			survey.AskOne(prompt1, &team, survey.WithValidator(survey.Required))
+
+			// Choose minus points
+			prompt2 := &survey.Select{
+				Message: "How many points to minus:",
+				Options: []string{"-20", "-30", "-50", "-100", "manual input"},
+			}
+			p := ""
+			survey.AskOne(prompt2, &p, survey.WithValidator(survey.Required))
+
+			switch p {
+			case prompt2.Options[4]:
+				manual := &survey.Input{Message: "How many points to minus:"}
+				survey.AskOne(manual, &p)
+			}
+
+			points, err := strconv.Atoi(p)
+			if err != nil || points == 0 {
+				break
+			}
+			// Choose reason
+			reason := ""
+			prompt3 := &survey.Input{Message: "Why"}
+			survey.AskOne(prompt3, &reason)
+			log.Println(team, points, "points cause of", reason)
+			// save to db
+			t := model.Team{}
+			if err := db.First(&t, "name = ?", team).Error; err != nil {
+				log.Println(err)
+			}
+			db.Create(&model.Event{
+				Log:     fmt.Sprintf("%s score %d", reason, points),
+				Point:   points,
+				TeamID:  t.ID,
+				QuestID: 0,
+			})
+
 		default: // exit
 			quit <- true
 			log.Println("Shutting down server...")
