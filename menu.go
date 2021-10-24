@@ -73,6 +73,7 @@ func menu(db *gorm.DB, quit chan bool) {
 			// TODO: add lose points events
 		default: // exit
 			quit <- true
+			log.Println("Shutting down server...")
 		}
 	}
 
