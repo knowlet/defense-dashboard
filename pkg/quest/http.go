@@ -2,6 +2,7 @@ package quest
 
 import (
 	"context"
+	"crypto/tls"
 	"io"
 	"net/http"
 	"time"
@@ -16,7 +17,12 @@ func request(method, url, hostname string, body io.Reader) (*http.Response, erro
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	}
 	client := &http.Client{
-		// Timeout: 10 * time.Second,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
 	}
 	go func() {
 		time.Sleep(time.Second * 10)
