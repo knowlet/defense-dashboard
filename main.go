@@ -50,6 +50,7 @@ func main() {
 	r := gin.Default()
 	r.GET("/ping", route.PingHandler)
 	r.GET("/service/:status", route.ServiceHandler)
+	r.GET("/team/:id", route.TeamHandler)
 
 	srv := &http.Server{
 		Addr:    ":8080",

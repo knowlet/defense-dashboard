@@ -2,8 +2,9 @@ package route
 
 import "github.com/gin-gonic/gin"
 
-func PingHandler(c *gin.Context) {
+func TeamHandler(c *gin.Context) {
+	id := c.Param("id")
 	c.JSON(200, gin.H{
-		"message": "pong",
+		"message": id,
 	})
 }
