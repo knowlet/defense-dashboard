@@ -48,9 +48,10 @@ func main() {
 
 	// Start the server
 	r := gin.Default()
+	r.LoadHTMLGlob("templates/*")
 	r.GET("/ping", route.PingHandler)
 	r.GET("/service/:status", route.ServiceHandler)
-	r.GET("/team/:id", route.TeamHandler)
+	r.GET("/team/:id", route.Controller{DB: db}.TeamHandler)
 
 	srv := &http.Server{
 		Addr:    ":8080",

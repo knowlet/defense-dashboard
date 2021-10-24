@@ -1,0 +1,37 @@
+<html>
+
+<head>
+	<meta http-equiv="refresh" content="30">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Screen message</title>
+	<style>
+		h1 {
+			padding-top: 15px;
+			text-align: center;
+			font-size: 16em;
+		}
+
+		h2 {
+			padding-top: 15px;
+			text-align: center;
+		}
+
+		textarea {
+			margin-top: -30px;
+			width: 100%;
+			height: calc(50% - 20em);
+			font-size: 1em;
+			border-style: none;
+			overflow-y: scroll;
+		}
+	</style>
+</head>
+
+<body>
+	<h2> {{ .team }}</h2>
+	<h1>{{ .score }}</h1>
+
+	<textarea readonly>{{ .logs }}</textarea>
+</body>
+
+</html>

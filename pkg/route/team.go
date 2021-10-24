@@ -1,10 +1,40 @@
 package route
 
-import "github.com/gin-gonic/gin"
+import (
+	"defense-dashboard/model"
+	"fmt"
+	"net/http"
+	"time"
 
-func TeamHandler(c *gin.Context) {
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+)
+
+type Controller struct {
+	DB *gorm.DB
+}
+
+func (h Controller) TeamHandler(c *gin.Context) {
 	id := c.Param("id")
-	c.JSON(200, gin.H{
-		"message": id,
+	team := model.Team{}
+	if err := h.DB.Preload("Events", func(db *gorm.DB) *gorm.DB {
+		return db.Order("created_at DESC")
+	}).First(&team, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Team not found"})
+		return
+	}
+
+	// calc score
+	score := 0
+	logs := ""
+	for _, e := range team.Events {
+		score += e.Point
+		logs += fmt.Sprintf("[%s] %s\n", e.CreatedAt.Format(time.Kitchen), e.Log)
+	}
+
+	c.HTML(http.StatusOK, "index.html", gin.H{
+		"team":  team.Name,
+		"score": score,
+		"logs":  logs,
 	})
 }
