@@ -1,7 +1,8 @@
-package main
+package cli
 
 import (
 	"defense-dashboard/model"
+	"defense-dashboard/pkg/score"
 	"fmt"
 	"log"
 	"os"
@@ -14,6 +15,9 @@ import (
 	"gorm.io/gorm/clause"
 )
 
+// TODO: add file lock
+var status = false
+
 func svc() string {
 	if status {
 		return "stop"
@@ -21,7 +25,7 @@ func svc() string {
 	return "start"
 }
 
-func menu(db *gorm.DB, quit chan bool) {
+func Menu(db *gorm.DB, quit chan bool) {
 	stop := make(chan bool)
 	for {
 		prompt := &survey.Select{
@@ -43,7 +47,7 @@ func menu(db *gorm.DB, quit chan bool) {
 				if status { // start
 					log.Println("Starting scoring service")
 					ticker := time.NewTicker(5 * time.Second)
-					go scoring(db, ticker, stop)
+					go score.Scoring(db, ticker, stop)
 				} else { // stop
 					log.Println("Stopping scoring service")
 					stop <- true

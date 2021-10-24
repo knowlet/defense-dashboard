@@ -1,4 +1,4 @@
-package main
+package quest
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 )
 
 // quest1
-func quest1(db *gorm.DB) {
+func Quest1(db *gorm.DB) {
 	type t struct {
 		id       uint
 		ip       string

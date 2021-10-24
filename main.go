@@ -3,6 +3,9 @@ package main
 import (
 	"context"
 	"defense-dashboard/model"
+	"defense-dashboard/pkg/cli"
+	"defense-dashboard/pkg/route"
+	"defense-dashboard/pkg/seed"
 	"errors"
 	"log"
 	"net/http"
@@ -14,14 +17,6 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
-
-// points
-const (
-	plus = 10
-)
-
-// TODO: add file lock
-var status = false
 
 func main() {
 	// If the file doesn't exist, create it or append to the file
@@ -48,18 +43,18 @@ func main() {
 	)
 
 	// Seed team data from file
-	seedTeam(db, "data/teams.txt")
+	seed.SeedTeam(db, "data/teams.txt")
 	// Seed quest data from file
-	seedQuest(db, "data/quests.csv")
+	seed.SeedQuest(db, "data/quests.csv")
 
 	// Start the menu
 	quit := make(chan bool)
-	go menu(db, quit)
+	go cli.Menu(db, quit)
 
 	// Start the server
 	r := gin.Default()
-	r.GET("/ping", PingHandler)
-	r.GET("/service/:status", ServiceHandler)
+	r.GET("/ping", route.PingHandler)
+	r.GET("/service/:status", route.ServiceHandler)
 
 	srv := &http.Server{
 		Addr:    ":8080",

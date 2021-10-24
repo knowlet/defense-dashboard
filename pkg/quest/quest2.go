@@ -1,4 +1,4 @@
-package main
+package quest
 
 import (
 	"log"
@@ -7,6 +7,6 @@ import (
 )
 
 // quest2
-func quest2(db *gorm.DB) {
+func Quest2(db *gorm.DB) {
 	log.Println("quest2")
 }
