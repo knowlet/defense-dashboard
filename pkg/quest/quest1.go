@@ -44,11 +44,21 @@ func Subversion(db *gorm.DB, data []map[string]interface{}) {
 
 				// check keywords
 				if strings.Contains(string(body), "WebSVN") {
+					// read team info
+					team := model.Team{}
+					if db.First(&team, t["id"]).Error != nil {
+						log.Fatal(err)
+					}
+					// read quest info
+					quest := model.Quest{}
+					if db.First(&quest, 1).Error != nil {
+						log.Fatal(err)
+					}
 					// save to db
 					db.Create(&model.Event{
-						Log:     fmt.Sprintf("#%d: Service alive Team%d score +%d", 1, t["id"], plus),
+						Log:     fmt.Sprintf("%s service alive %s score +%d", quest.Name, team.Name, plus),
 						Point:   plus,
-						TeamID:  uint(t["id"].(int)),
+						TeamID:  team.ID,
 						QuestID: 1,
 					})
 				}
