@@ -19,11 +19,11 @@ func SeedTeam(db *gorm.DB, path string) {
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		log.Println()
-		if scanner.Text() == "" {
+		teamName := strings.TrimSpace(scanner.Text())
+		if teamName == "" {
 			continue
 		}
-		queryModel := &model.Team{Name: strings.TrimSpace(scanner.Text())}
+		queryModel := &model.Team{Name: teamName}
 		db.FirstOrCreate(&model.Team{}, queryModel)
 	}
 }
