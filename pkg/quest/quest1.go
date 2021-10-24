@@ -34,7 +34,7 @@ func Subversion(db *gorm.DB, data []map[string]interface{}) {
 
 				// check keywords
 				if strings.Contains(string(body), "WebSVN") {
-					plusPoint(db, t)
+					plusPoint(db, 1, t)
 				}
 			}
 		}(team)

@@ -12,6 +12,9 @@ func request(method, url, hostname string, body io.Reader) (*http.Response, erro
 	ctx, cancel := context.WithCancel(ctx)
 	req, _ := http.NewRequestWithContext(ctx, method, url, body)
 	req.Host = hostname
+	if body != nil {
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	}
 	client := &http.Client{
 		// Timeout: 10 * time.Second,
 	}

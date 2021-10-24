@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func plusPoint(db *gorm.DB, t map[string]interface{}) {
+func plusPoint(db *gorm.DB, qID uint, t map[string]interface{}) {
 	// read team info
 	team := model.Team{}
 	if err := db.First(&team, t["id"]).Error; err != nil {
@@ -16,7 +16,7 @@ func plusPoint(db *gorm.DB, t map[string]interface{}) {
 	}
 	// read quest info
 	quest := model.Quest{}
-	if err := db.First(&quest, 1).Error; err != nil {
+	if err := db.First(&quest, qID).Error; err != nil {
 		log.Fatal(err)
 	}
 	// save to db
@@ -24,6 +24,6 @@ func plusPoint(db *gorm.DB, t map[string]interface{}) {
 		Log:     fmt.Sprintf("%s service alive %s score +%d", quest.Name, team.Name, plus),
 		Point:   plus,
 		TeamID:  team.ID,
-		QuestID: 1,
+		QuestID: qID,
 	})
 }

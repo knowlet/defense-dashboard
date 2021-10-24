@@ -5,6 +5,7 @@ import (
 	"crypto/hmac"
 	"crypto/rand"
 	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"log"
 	"net/http"
@@ -29,17 +30,26 @@ func News(db *gorm.DB, data []map[string]interface{}) {
 	for idx, team := range data {
 		team["id"] = idx + 1 // team id begins from 1
 		go func(t map[string]interface{}) {
+			// generate random message
+			key := make([]byte, 32)
+			rand.Read(key)
+			message := hex.EncodeToString(key)
+			log.Println("message:", message)
+			mac := hmac.New(sha256.New, []byte("HITCON_DEFENSE_2021"))
+			mac.Write([]byte(message))
+			expectedMAC := mac.Sum(nil)
+			log.Println("[+] Expected MAC:", expectedMAC)
+			// querystring
+			data := url.Values{}
+			data.Set("MSG", message)
+			log.Println("[+] Querystring:", data.Encode())
+
+			// check all paths
 			check := 0
 			for _, path := range paths {
 				log.Println("[+] Checking", path)
-				// generate random message
-				message := make([]byte, 32)
-				rand.Read(message)
 
 				// create request
-				data := url.Values{}
-				data.Set("MSG", string(message))
-
 				resp, err := request(
 					http.MethodPost,
 					fmt.Sprintf("http://%s%s", t["ip"], path),
@@ -53,22 +63,22 @@ func News(db *gorm.DB, data []map[string]interface{}) {
 				log.Println(resp.Request.URL.String())
 				log.Println("[+] Response", resp.Status)
 				if resp.StatusCode == http.StatusOK {
-					// read body
-					defer resp.Body.Close()
-					// 258d9e21979350a42abb02ad21f60bbf0f398766eea23c126f7ca15acdb33f08
+					// get first line
 					scanner := bufio.NewScanner(resp.Body)
 					if err != nil {
 						return
 					}
-					// get first line
 					scanner.Scan()
-					messageMAC := []byte(scanner.Text())
+					line := strings.TrimSpace(scanner.Text())
+					log.Println("[+] Response", line)
+					// read hmac sha256
+					messageMAC, err := hex.DecodeString(line)
+					if err != nil {
+						return
+					}
 					log.Println("[+] Message MAC:", messageMAC)
 
 					// check hmac
-					mac := hmac.New(sha256.New, []byte("HITCON_DEFENSE_2021"))
-					mac.Write(message)
-					expectedMAC := mac.Sum(nil)
 					if hmac.Equal(messageMAC, expectedMAC) {
 						check++
 						log.Println("[+]", t["ip"], path, "check:", check)
@@ -76,7 +86,7 @@ func News(db *gorm.DB, data []map[string]interface{}) {
 				}
 			}
 			if check == len(paths) {
-				plusPoint(db, t)
+				plusPoint(db, 5, t)
 			}
 		}(team)
 	}
