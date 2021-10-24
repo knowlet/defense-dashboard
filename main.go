@@ -4,8 +4,8 @@ import (
 	"context"
 	"defense-dashboard/model"
 	"defense-dashboard/pkg/cli"
+	"defense-dashboard/pkg/helper"
 	"defense-dashboard/pkg/route"
-	"defense-dashboard/pkg/seed"
 	"errors"
 	"log"
 	"net/http"
@@ -38,9 +38,9 @@ func main() {
 	)
 
 	// Seed team data from file
-	seed.SeedTeam(db, "data/teams.txt")
+	helper.SeedTeam(db, "data/teams.txt")
 	// Seed quest data from file
-	seed.SeedQuest(db, "data/quests.csv")
+	helper.SeedQuest(db, "data/quests.csv")
 
 	// Start the menu
 	quit := make(chan bool)
