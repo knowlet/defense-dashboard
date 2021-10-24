@@ -15,7 +15,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 func main() {
@@ -24,7 +23,7 @@ func main() {
 
 	// Open the data.db file. It will be created if it doesn't exist.
 	db, err := gorm.Open(sqlite.Open("data.db"), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
+		// Logger: logger.Default.LogMode(logger.Info),
 	})
 	if err != nil {
 		log.Fatal("failed to connect database")
@@ -47,11 +46,14 @@ func main() {
 	go cli.Menu(db, quit)
 
 	// Start the server
-	r := gin.Default()
+	r := gin.New()
+	// r.Use(gin.Logger())
+	r.Use(gin.Recovery())
 	r.LoadHTMLGlob("templates/*")
 	r.GET("/ping", route.PingHandler)
 	r.GET("/service/:status", route.ServiceHandler)
 	r.GET("/team/:id", route.Controller{DB: db}.TeamHandler)
+	r.GET("/team", route.TeamViewHandler)
 
 	srv := &http.Server{
 		Addr:    ":8080",

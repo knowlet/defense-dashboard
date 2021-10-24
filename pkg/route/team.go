@@ -38,3 +38,7 @@ func (h Controller) TeamHandler(c *gin.Context) {
 		"logs":  logs,
 	})
 }
+
+func TeamViewHandler(c *gin.Context) {
+	c.HTML(http.StatusOK, "view.html", gin.H{})
+}
