@@ -14,7 +14,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// TODO: add file lock
 var status = false
 
 func svc() string {
