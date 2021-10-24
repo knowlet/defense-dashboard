@@ -2,7 +2,6 @@ package quest
 
 import (
 	"context"
-	"defense-dashboard/model"
 	"fmt"
 	"io"
 	"log"
@@ -34,9 +33,9 @@ func Subversion(db *gorm.DB, data []map[string]interface{}) {
 				log.Println(err) // cancel caught
 				return
 			}
+			defer resp.Body.Close()
 			if resp.StatusCode == http.StatusOK {
 				// read body
-				defer resp.Body.Close()
 				body, err := io.ReadAll(resp.Body)
 				if err != nil {
 					return
@@ -44,23 +43,7 @@ func Subversion(db *gorm.DB, data []map[string]interface{}) {
 
 				// check keywords
 				if strings.Contains(string(body), "WebSVN") {
-					// read team info
-					team := model.Team{}
-					if db.First(&team, t["id"]).Error != nil {
-						log.Fatal(err)
-					}
-					// read quest info
-					quest := model.Quest{}
-					if db.First(&quest, 1).Error != nil {
-						log.Fatal(err)
-					}
-					// save to db
-					db.Create(&model.Event{
-						Log:     fmt.Sprintf("%s service alive %s score +%d", quest.Name, team.Name, plus),
-						Point:   plus,
-						TeamID:  team.ID,
-						QuestID: 1,
-					})
+					plusPoint(db, t)
 				}
 			}
 		}(team)
