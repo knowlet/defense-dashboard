@@ -42,3 +42,23 @@ func (h Controller) TeamHandler(c *gin.Context) {
 func TeamViewHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "view.html", gin.H{})
 }
+
+func (h Controller) TeamViewLogsHandler(c *gin.Context) {
+	queryModel := []struct {
+		CreatedAt time.Time
+		Log       string
+		Point     int
+		Name      string
+	}{}
+	if err := h.DB.Select("*").
+		Model(&model.Event{}).
+		Joins("left join teams on events.team_id = teams.id").
+		Find(&queryModel).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "cannot log events"})
+		return
+	}
+
+	c.HTML(http.StatusOK, "events.html", gin.H{
+		"Events": queryModel,
+	})
+}

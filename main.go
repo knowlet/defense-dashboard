@@ -52,8 +52,9 @@ func main() {
 	r.LoadHTMLGlob("templates/*")
 	r.GET("/ping", route.PingHandler)
 	r.GET("/service/:status", route.ServiceHandler)
-	r.GET("/team/:id", route.Controller{DB: db}.TeamHandler)
 	r.GET("/team", route.TeamViewHandler)
+	r.GET("/team/events", route.Controller{DB: db}.TeamViewLogsHandler)
+	r.GET("/team/:id", route.Controller{DB: db}.TeamHandler)
 
 	srv := &http.Server{
 		Addr:    ":8080",

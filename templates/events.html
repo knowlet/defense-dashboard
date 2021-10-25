@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Events</title>
+  <style>
+    table {
+      font-family: Arial, Helvetica, sans-serif;
+      border-collapse: collapse;
+      width: 100%;
+    }
+    
+    table td, table th {
+      border: 1px solid #ddd;
+      padding: 8px;
+      white-space: nowrap;
+    }
+
+    td div {
+      width: 170px;
+      white-space: nowrap;
+      overflow-x: hidden;
+    }
+    
+    table tr:nth-child(even){background-color: #f2f2f2;}
+    
+    table tr:hover {background-color: #ddd;}
+    
+    table th {
+      padding-top: 12px;
+      padding-bottom: 12px;
+      text-align: left;
+      background-color: #04AA6D;
+      color: white;
+    }
+    </style>
+</head>
+<body>
+  <table>
+    <tr>
+      <th width="180">Time</th>
+      <th width="240">Team</th>
+      <th>Point</th>
+      <th>Log</th>
+    </tr>
+  {{range .Events}}
+    <tr>
+      <td><div>{{.CreatedAt}}</div></td>
+      <td>{{.Name}}</td>
+      <td>{{.Point}}</td>
+      <td>{{.Log}}</td>
+    </tr>
+  {{end}}
+  </table>
+</body>
+</html>
