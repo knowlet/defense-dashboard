@@ -16,7 +16,7 @@ func OA(db *gorm.DB, data []map[string]interface{}) {
 			// get login page
 			resp, err := request(
 				http.MethodPost,
-				fmt.Sprintf("https://%s/icehrm/app/login.php", t["ip"]),
+				fmt.Sprintf("https://%s/icehrm/app/data/value_Ms7u5RZUJbAv9M1634992053374.png", t["ip"]),
 				t["hostname"].(string), nil)
 			if err != nil {
 				log.Println(err) // cancel caught
