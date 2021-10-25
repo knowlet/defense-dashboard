@@ -49,12 +49,15 @@ func main() {
 	r := gin.New()
 	// r.Use(gin.Logger())
 	r.Use(gin.Recovery())
+	r.Static("/assets", "./assets")
 	r.LoadHTMLGlob("templates/*")
 	r.GET("/ping", route.PingHandler)
 	r.GET("/service/:status", route.ServiceHandler)
-	r.GET("/team", route.TeamViewHandler)
-	r.GET("/team/events", route.Controller{DB: db}.TeamViewLogsHandler)
-	r.GET("/team/:id", route.Controller{DB: db}.TeamHandler)
+	t := r.Group("/team")
+	t.GET("/", route.Controller{DB: db}.TeamHandler)
+	t.GET("/view", route.TeamViewHandler)
+	t.GET("/events", route.Controller{DB: db}.TeamViewLogsHandler)
+	r.GET("/board", route.TeamBoardHandler)
 
 	srv := &http.Server{
 		Addr:    ":8080",

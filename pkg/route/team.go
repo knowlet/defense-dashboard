@@ -2,7 +2,6 @@ package route
 
 import (
 	"defense-dashboard/model"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -15,28 +14,29 @@ type Controller struct {
 }
 
 func (h Controller) TeamHandler(c *gin.Context) {
-	id := c.Param("id")
-	team := model.Team{}
+	queryModel := []model.Team{}
 	if err := h.DB.Preload("Events", func(db *gorm.DB) *gorm.DB {
 		return db.Order("created_at DESC")
-	}).First(&team, id).Error; err != nil {
+	}).Find(&queryModel).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Team not found"})
 		return
 	}
-
-	// calc score
-	score := 0
-	logs := ""
-	for _, e := range team.Events {
-		score += e.Point
-		logs += fmt.Sprintf("[%s] %s\n", e.CreatedAt.Format(time.Kitchen), e.Log)
+	type tt struct {
+		Name  string `json:"name"`
+		Score int    `json:"score"`
 	}
-
-	c.HTML(http.StatusOK, "index.html", gin.H{
-		"team":  team.Name,
-		"score": score,
-		"logs":  logs,
-	})
+	teams := []tt{}
+	for _, t := range queryModel {
+		score := 0
+		for _, e := range t.Events {
+			score += e.Point
+		}
+		teams = append(teams, tt{
+			Name:  t.Name,
+			Score: score,
+		})
+	}
+	c.JSON(http.StatusOK, teams)
 }
 
 func TeamViewHandler(c *gin.Context) {
@@ -61,4 +61,8 @@ func (h Controller) TeamViewLogsHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "events.html", gin.H{
 		"Events": queryModel,
 	})
+}
+
+func TeamBoardHandler(c *gin.Context) {
+	c.HTML(http.StatusOK, "board.html", gin.H{})
 }

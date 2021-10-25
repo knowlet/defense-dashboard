@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      background-image: url("/assets/images/192.png");
+    }
+
+    .point {
+      position: absolute;
+      font-size: 6rem;
+    }
+
+    #team1 {
+      left: 370px;
+      top: 345px;
+    }
+
+    #team2 {
+      left: 860px;
+      top: 285px;
+    }
+
+    #team3 {
+      left: 1465px;
+      top: 345px;
+    }
+
+    #team4 {
+      left: 1465px;
+      top: 655px;
+    }
+
+    #team5 {
+      left: 965px;
+      top: 820px;
+    }
+
+    #team6 {
+      left: 390px;
+      top: 705px;
+    }
+  </style>
+</head>
+<body>
+  <div class="point" id="team1"></div>
+  <div class="point" id="team2"></div>
+  <div class="point" id="team3"></div>
+  <div class="point" id="team4"></div>
+  <div class="point" id="team5"></div>
+  <div class="point" id="team6"></div>
+</body>
+<script>
+  setInterval(() => {
+    fetch("/team")  
+      .then(res => res.json())
+      .then(teams => teams.forEach((t, i) => {
+        document.getElementById(`team${i+1}`).textContent = t.score;
+      }));
+  }, 1000)
+</script>
+</html>
