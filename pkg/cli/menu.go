@@ -100,18 +100,38 @@ func Menu(db *gorm.DB, quit chan bool) {
 			// Choose minus points
 			prompt2 := &survey.Select{
 				Message: "How many points to minus:",
-				Options: []string{"-20", "-30", "-50", "-100", "manual input"},
+				Options: []string{"-20", "-30", "-50", "-100", "-20%", "manual input"},
 			}
 			p := ""
 			survey.AskOne(prompt2, &p, survey.WithValidator(survey.Required))
 
 			switch p {
-			case prompt2.Options[4]:
+			case prompt2.Options[5]:
 				manual := &survey.Input{Message: "How many points to minus:"}
 				survey.AskOne(manual, &p)
 			}
 
-			points, err := strconv.Atoi(p)
+			// read team
+			t := model.Team{}
+			if err := db.Preload("Events").Find(&t).Error; err != nil {
+				log.Println(err)
+				break
+			}
+
+			// check if is persent
+			points := 0
+			if strings.Contains(p, "%") {
+				// get persent
+				points, err = strconv.Atoi(p[:strings.Index(p, "%")])
+				// sum score
+				score := 0
+				for _, e := range t.Events {
+					score += e.Point
+				}
+				points = score * points / 100
+			} else {
+				points, _ = strconv.Atoi(p)
+			}
 			if err != nil || points == 0 {
 				break
 			}
@@ -121,10 +141,6 @@ func Menu(db *gorm.DB, quit chan bool) {
 			survey.AskOne(prompt3, &reason)
 			log.Println(team, points, "points cause of", reason)
 			// save to db
-			t := model.Team{}
-			if err := db.First(&t, "name = ?", team).Error; err != nil {
-				log.Println(err)
-			}
 			db.Create(&model.Event{
 				Log:     fmt.Sprintf("[-] %s %s score %d", t.Name, reason, points),
 				Point:   points,
