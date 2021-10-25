@@ -124,6 +124,10 @@ func Menu(db *gorm.DB, quit chan bool) {
 			if strings.Contains(p, "%") {
 				// get persent
 				points, err = strconv.Atoi(p[:strings.Index(p, "%")])
+				if err != nil {
+					log.Println(err)
+					break
+				}
 				// sum score
 				score := 0
 				for _, e := range t.Events {
@@ -143,7 +147,7 @@ func Menu(db *gorm.DB, quit chan bool) {
 			log.Println(team, points, "points cause of", reason)
 			// save to db
 			db.Create(&model.Event{
-				Log:     fmt.Sprintf("[-] %s %s score %d", t.Name, reason, points),
+				Log:     fmt.Sprintf("[-] %s %s score %s", t.Name, reason, p),
 				Point:   points,
 				TeamID:  t.ID,
 				QuestID: 0,
