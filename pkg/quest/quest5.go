@@ -3,8 +3,8 @@ package quest
 import (
 	"bufio"
 	"crypto/hmac"
-	"crypto/rand"
 	"crypto/sha256"
+	"defense-dashboard/pkg/helper"
 	"encoding/hex"
 	"fmt"
 	"log"
@@ -31,9 +31,7 @@ func News(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 		team["id"] = idx + 1 // team id begins from 1
 		go func(t map[string]interface{}) {
 			// generate random message
-			key := make([]byte, 32)
-			rand.Read(key)
-			message := hex.EncodeToString(key)
+			message := helper.RandomString()
 			log.Println("message:", message)
 			mac := hmac.New(sha256.New, []byte("HITCON_DEFENSE_2021"))
 			mac.Write([]byte(message))

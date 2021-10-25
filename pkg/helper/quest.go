@@ -1,8 +1,10 @@
 package helper
 
 import (
+	"crypto/rand"
 	"defense-dashboard/model"
 	"encoding/csv"
+	"encoding/hex"
 	"io"
 	"log"
 	"os"
@@ -58,4 +60,11 @@ func ReadQ1(path string) []map[string]interface{} {
 	}
 	defer file.Close()
 	return CsvToMap(file)
+}
+
+func RandomString() string {
+	// generate random message
+	key := make([]byte, 32)
+	rand.Read(key)
+	return hex.EncodeToString(key)
 }
