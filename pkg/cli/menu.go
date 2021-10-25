@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/AlecAivazis/survey/v2"
@@ -28,7 +29,11 @@ func Menu(db *gorm.DB, quit chan bool) {
 	for {
 		prompt := &survey.Select{
 			Message: "Welcome to Dashboard System:",
-			Options: []string{svc() + " service", "view score", "lose points", "exit"},
+			Options: []string{svc() + " service",
+				"view score",
+				"lose points",
+				"delete logs",
+				"exit"},
 		}
 		var opts string
 		survey.AskOne(prompt, &opts, survey.WithValidator(survey.Required))
@@ -126,6 +131,34 @@ func Menu(db *gorm.DB, quit chan bool) {
 				TeamID:  t.ID,
 				QuestID: 0,
 			})
+
+		case prompt.Options[3]: // delete logs
+			queryModel := []model.Event{}
+			if err := db.Find(&queryModel).Error; err != nil {
+				log.Println(err)
+				break
+			}
+			opts := []string{}
+			for _, e := range queryModel {
+				opts = append(opts, fmt.Sprintf("%d: %s", e.ID, e.Log))
+			}
+			prompt := &survey.MultiSelect{
+				Message: "Choose which log to delete",
+				Options: opts,
+			}
+			logs := []string{}
+			survey.AskOne(prompt, &logs)
+			// map back to id
+			ids := []int{}
+			for _, l := range logs {
+				id, err := strconv.Atoi(l[:strings.Index(l, ":")])
+				if err != nil {
+					log.Println(err)
+					continue
+				}
+				ids = append(ids, id)
+			}
+			db.Delete(&model.Event{}, ids)
 
 		default: // exit
 			quit <- true
