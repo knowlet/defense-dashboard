@@ -87,6 +87,8 @@ func News(db *gorm.DB, data []map[string]interface{}) {
 			}
 			if check == len(paths) {
 				plusPoint(db, 5, t)
+			} else {
+				srvDown(db, 2, t)
 			}
 		}(team)
 	}

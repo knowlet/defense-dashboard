@@ -47,7 +47,9 @@ func Exchange(db *gorm.DB, data []map[string]interface{}) {
 					return
 				}
 				if url.Path == "/owa" {
-					plusPoint(db, 5, t)
+					plusPoint(db, 2, t)
+				} else {
+					srvDown(db, 2, t)
 				}
 			}
 		}(team)

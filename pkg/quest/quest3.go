@@ -27,6 +27,8 @@ func OA(db *gorm.DB, data []map[string]interface{}) {
 			log.Println("[+] Response", resp.Status)
 			if resp.StatusCode == http.StatusOK {
 				plusPoint(db, 3, t)
+			} else {
+				srvDown(db, 2, t)
 			}
 		}(team)
 	}

@@ -60,6 +60,8 @@ func Stack(db *gorm.DB, data []map[string]interface{}) {
 				sub := now.Sub(tt).Minutes()
 				if sub > -2 && sub < 2 {
 					plusPoint(db, 4, t)
+				} else {
+					srvDown(db, 2, t)
 				}
 			}
 		}(team)
