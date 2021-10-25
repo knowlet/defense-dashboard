@@ -49,7 +49,7 @@ func Menu(db *gorm.DB, quit chan bool) {
 				status = !status
 				if status { // start
 					log.Println("Starting scoring service")
-					ticker := time.NewTicker(5 * time.Second)
+					ticker := time.NewTicker(5 * time.Minute)
 					go score.Scoring(db, ticker, stop)
 				} else { // stop
 					log.Println("Stopping scoring service")
@@ -126,7 +126,7 @@ func Menu(db *gorm.DB, quit chan bool) {
 				log.Println(err)
 			}
 			db.Create(&model.Event{
-				Log:     fmt.Sprintf("%s score %d", reason, points),
+				Log:     fmt.Sprintf("[-] %s %s score %d", t.Name, reason, points),
 				Point:   points,
 				TeamID:  t.ID,
 				QuestID: 0,
