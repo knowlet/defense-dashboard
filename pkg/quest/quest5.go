@@ -57,6 +57,7 @@ func News(db *gorm.DB, data []map[string]interface{}) {
 					strings.NewReader(data.Encode()))
 				if err != nil {
 					log.Println(err) // cancel caught
+					srvDown(db, 5, t)
 					return
 				}
 				defer resp.Body.Close()
@@ -66,6 +67,7 @@ func News(db *gorm.DB, data []map[string]interface{}) {
 					// get first line
 					scanner := bufio.NewScanner(resp.Body)
 					if err != nil {
+						srvDown(db, 5, t)
 						return
 					}
 					scanner.Scan()
@@ -74,6 +76,7 @@ func News(db *gorm.DB, data []map[string]interface{}) {
 					// read hmac sha256
 					messageMAC, err := hex.DecodeString(line)
 					if err != nil {
+						srvDown(db, 5, t)
 						return
 					}
 					log.Println("[+] Message MAC:", messageMAC)
@@ -83,12 +86,15 @@ func News(db *gorm.DB, data []map[string]interface{}) {
 						check++
 						log.Println("[+]", t["ip"], path, "check:", check)
 					}
+				} else {
+					srvDown(db, 5, t)
+					return
 				}
 			}
 			if check == len(paths) {
 				plusPoint(db, 5, t)
 			} else {
-				srvDown(db, 2, t)
+				srvDown(db, 5, t)
 			}
 		}(team)
 	}

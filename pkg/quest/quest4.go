@@ -16,6 +16,11 @@ import (
 
 // Stack
 func Stack(db *gorm.DB, data []map[string]interface{}) {
+	// set loc
+	loc, err := time.LoadLocation("Asia/Taipei")
+	if err != nil {
+		log.Fatal(err)
+	}
 	for idx, team := range data {
 		team["id"] = idx + 1 // team id begins from 1
 		go func(t map[string]interface{}) {
@@ -27,6 +32,7 @@ func Stack(db *gorm.DB, data []map[string]interface{}) {
 				strings.NewReader(`{"output":{"id":"graphs_Container","property":"children"},"event":"interval"}`))
 			if err != nil {
 				log.Println(err) // cancel caught
+				srvDown(db, 4, t)
 				return
 			}
 			defer resp.Body.Close()
@@ -36,6 +42,7 @@ func Stack(db *gorm.DB, data []map[string]interface{}) {
 				// read body
 				body, err := io.ReadAll(resp.Body)
 				if err != nil {
+					srvDown(db, 4, t)
 					return
 				}
 				json := string(body)
@@ -46,11 +53,7 @@ func Stack(db *gorm.DB, data []map[string]interface{}) {
 				// get current time
 				now := time.Now()
 				log.Println(now)
-				// set loc
-				loc, err := time.LoadLocation("Asia/Taipei")
-				if err != nil {
-					log.Fatal(err)
-				}
+
 				dt := strings.Split(dtime, ":")
 				h, _ := strconv.Atoi(dt[0])
 				m, _ := strconv.Atoi(dt[1])
@@ -61,8 +64,10 @@ func Stack(db *gorm.DB, data []map[string]interface{}) {
 				if sub > -2 && sub < 2 {
 					plusPoint(db, 4, t)
 				} else {
-					srvDown(db, 2, t)
+					srvDown(db, 4, t)
 				}
+			} else {
+				srvDown(db, 4, t)
 			}
 		}(team)
 	}

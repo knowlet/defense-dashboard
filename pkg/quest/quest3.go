@@ -20,6 +20,7 @@ func OA(db *gorm.DB, data []map[string]interface{}) {
 				t["hostname"].(string), nil)
 			if err != nil {
 				log.Println(err) // cancel caught
+				srvDown(db, 3, t)
 				return
 			}
 			defer resp.Body.Close()
@@ -28,7 +29,7 @@ func OA(db *gorm.DB, data []map[string]interface{}) {
 			if resp.StatusCode == http.StatusOK {
 				plusPoint(db, 3, t)
 			} else {
-				srvDown(db, 2, t)
+				srvDown(db, 3, t)
 			}
 		}(team)
 	}
