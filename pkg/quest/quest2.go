@@ -49,7 +49,8 @@ func Exchange(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 					srvDown(db, 2, t)
 					return
 				}
-				if url.Path == "/owa" {
+				// if url.Path == "/owa" {
+				if url.Path != "" {
 					plusPoint(db, 2, t, ischeck)
 				} else {
 					srvDown(db, 2, t)
