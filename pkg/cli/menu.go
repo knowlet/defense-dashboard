@@ -157,7 +157,7 @@ func Menu(db *gorm.DB, quit chan bool) {
 
 		case prompt.Options[3]: // delete logs
 			queryModel := []model.Event{}
-			if err := db.Find(&queryModel).Error; err != nil {
+			if err := db.Find(&queryModel).Order("created_at DESC").Error; err != nil {
 				log.Println(err)
 				break
 			}
