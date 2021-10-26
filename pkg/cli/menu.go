@@ -116,7 +116,7 @@ func Menu(db *gorm.DB, quit chan bool) {
 
 			// read team
 			t := model.Team{}
-			if err := db.Preload("Events").Find(&t).Error; err != nil {
+			if err := db.Preload("Events").Where("name = ?", team).Find(&t).Error; err != nil {
 				log.Println(err)
 				break
 			}
