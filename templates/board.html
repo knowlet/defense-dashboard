@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Score Board</title>
   <style>
     body {
       background-image: url("/assets/images/192.png");
@@ -56,12 +56,14 @@
   <div class="point" id="team6"></div>
 </body>
 <script>
-  setInterval(() => {
+  const get = () => {
     fetch("/team/")  
       .then(res => res.json())
       .then(teams => teams.forEach((t, i) => {
         document.getElementById(`team${i+1}`).textContent = t.score;
       }));
-  }, 1000)
+  }
+  get();
+  setInterval(get, 10000);
 </script>
 </html>
