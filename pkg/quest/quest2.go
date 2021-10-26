@@ -45,6 +45,7 @@ func Exchange(db *gorm.DB, data []map[string]interface{}) {
 			if resp.StatusCode == http.StatusFound {
 				url, err := resp.Location()
 				if err != nil {
+					log.Println(err)
 					srvDown(db, 2, t)
 					return
 				}

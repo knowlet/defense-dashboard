@@ -30,6 +30,7 @@ func Subversion(db *gorm.DB, data []map[string]interface{}) {
 				// read body
 				body, err := io.ReadAll(resp.Body)
 				if err != nil {
+					log.Println(err)
 					srvDown(db, 1, t)
 					return
 				}
