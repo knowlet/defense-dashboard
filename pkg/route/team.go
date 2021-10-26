@@ -71,9 +71,14 @@ func TeamViewHandler(c *gin.Context) {
 
 func (h Controller) TeamViewLogsHandler(c *gin.Context) {
 	nolimit := c.Query("nolimit")
+	norefresh := c.Query("norefresh")
 	limit := 100
+	refresh := true
 	if nolimit != "" {
 		limit = 0
+	}
+	if norefresh != "" {
+		refresh = false
 	}
 	queryModel := []struct {
 		CreatedAt time.Time
@@ -92,7 +97,8 @@ func (h Controller) TeamViewLogsHandler(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "events.html", gin.H{
-		"Events": queryModel,
+		"Events":    queryModel,
+		"NoRefresh": refresh,
 	})
 }
 
