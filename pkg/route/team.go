@@ -79,6 +79,7 @@ func (h Controller) TeamViewLogsHandler(c *gin.Context) {
 	if err := h.DB.Select("*").
 		Model(&model.Event{}).
 		Joins("left join teams on events.team_id = teams.id").
+		Order("created_at DESC").
 		Find(&queryModel).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "cannot log events"})
 		return
