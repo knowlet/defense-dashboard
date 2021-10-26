@@ -70,6 +70,11 @@ func TeamViewHandler(c *gin.Context) {
 }
 
 func (h Controller) TeamViewLogsHandler(c *gin.Context) {
+	nolimit := c.Query("nolimit")
+	limit := 100
+	if nolimit != "" {
+		limit = 0
+	}
 	queryModel := []struct {
 		CreatedAt time.Time
 		Log       string
@@ -80,6 +85,7 @@ func (h Controller) TeamViewLogsHandler(c *gin.Context) {
 		Model(&model.Event{}).
 		Joins("left join teams on events.team_id = teams.id").
 		Order("created_at DESC").
+		Limit(limit).
 		Find(&queryModel).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "cannot log events"})
 		return
