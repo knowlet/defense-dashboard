@@ -15,6 +15,21 @@ func Exchange(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 	for idx, team := range data {
 		team["id"] = idx + 1 // team id begins from 1
 		go func(t map[string]interface{}) {
+			// check logon page
+			resp1, err := request(
+				http.MethodGet,
+				fmt.Sprintf("https://%s/owa/auth/logon.aspx?replaceCurrent=1&url=", t["ip"]),
+				t["hostname"].(string), nil)
+			if err != nil {
+				log.Println(err) // cancel caught
+				srvDown(db, 2, t)
+				return
+			}
+			defer resp1.Body.Close()
+			if resp1.StatusCode != http.StatusOK {
+				srvDown(db, 2, t)
+				return
+			}
 
 			// querystring
 			data := url.Values{}
