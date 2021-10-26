@@ -17,6 +17,7 @@ import (
 
 var status = false
 var duration = 5 * time.Minute
+var duration2 = 15 * time.Second
 
 func svc() string {
 	if status {
@@ -51,7 +52,8 @@ func Menu(db *gorm.DB, quit chan bool) {
 				if status { // start
 					log.Println("Starting scoring service")
 					ticker := time.NewTicker(duration)
-					go score.Scoring(db, ticker, stop)
+					ticker2 := time.NewTicker(duration2)
+					go score.Scoring(db, ticker, ticker2, stop)
 				} else { // stop
 					log.Println("Stopping scoring service")
 					stop <- true

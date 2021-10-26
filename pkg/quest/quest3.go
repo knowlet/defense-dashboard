@@ -9,7 +9,7 @@ import (
 )
 
 // OA
-func OA(db *gorm.DB, data []map[string]interface{}) {
+func OA(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 	for idx, team := range data {
 		team["id"] = idx + 1 // team id begins from 1
 		go func(t map[string]interface{}) {
@@ -27,7 +27,7 @@ func OA(db *gorm.DB, data []map[string]interface{}) {
 			log.Println(resp.Request.URL.String())
 			log.Println("[+] Response", resp.Status)
 			if resp.StatusCode == http.StatusOK {
-				plusPoint(db, 3, t)
+				plusPoint(db, 3, t, ischeck)
 			} else {
 				srvDown(db, 3, t)
 			}

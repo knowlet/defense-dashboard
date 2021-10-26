@@ -26,7 +26,7 @@ var (
 )
 
 // News
-func News(db *gorm.DB, data []map[string]interface{}) {
+func News(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 	for idx, team := range data {
 		team["id"] = idx + 1 // team id begins from 1
 		go func(t map[string]interface{}) {
@@ -92,7 +92,7 @@ func News(db *gorm.DB, data []map[string]interface{}) {
 				}
 			}
 			if check == len(paths) {
-				plusPoint(db, 5, t)
+				plusPoint(db, 5, t, ischeck)
 			} else {
 				srvDown(db, 5, t)
 			}

@@ -13,7 +13,7 @@ import (
 )
 
 // Stack
-func Stack(db *gorm.DB, data []map[string]interface{}) {
+func Stack(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 	// set loc
 	// loc, err := time.LoadLocation("Asia/Taipei")
 	// if err != nil {
@@ -56,7 +56,7 @@ func Stack(db *gorm.DB, data []map[string]interface{}) {
 				// patch
 				if dtime != "" {
 					log.Println("[+] Time", dtime)
-					plusPoint(db, 4, t)
+					plusPoint(db, 4, t, ischeck)
 				} else {
 					srvDown(db, 4, t)
 				}
