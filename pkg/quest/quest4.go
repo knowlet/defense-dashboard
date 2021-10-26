@@ -6,7 +6,9 @@ import (
 	"log"
 	"net/http"
 	"regexp"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/tidwall/gjson"
 	"gorm.io/gorm"
@@ -15,10 +17,10 @@ import (
 // Stack
 func Stack(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 	// set loc
-	// loc, err := time.LoadLocation("Asia/Taipei")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	loc, err := time.LoadLocation("Asia/Taipei")
+	if err != nil {
+		log.Fatal(err)
+	}
 	for idx, team := range data {
 		team["id"] = idx + 1 // team id begins from 1
 		go func(t map[string]interface{}) {
@@ -50,31 +52,30 @@ func Stack(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 				// get web time
 				dtime := dRexp.FindString(value.String())
 				// get current time
-				// now := time.Now()
-				// log.Println(now)
+				now := time.Now()
+				log.Println(now)
 
-				// patch
-				if dtime != "" {
-					log.Println("[+] Time", dtime)
+				dt := strings.Split(dtime, ":")
+				h, _ := strconv.Atoi(dt[0])
+				m, _ := strconv.Atoi(dt[1])
+				s, _ := strconv.Atoi(dt[2])
+				tt := time.Date(now.Year(), now.Month(), now.Day(), h, m, s, 0, loc)
+				// deviation within 2 minutes
+				sub := now.Sub(tt).Minutes()
+				if sub > -2 && sub < 2 {
 					plusPoint(db, 4, t, ischeck)
 				} else {
+					log.Println("[-] Time deviation", sub)
 					srvDown(db, 4, t)
 				}
 
-				// dt := strings.Split(dtime, ":")
-				// h, _ := strconv.Atoi(dt[0])
-				// m, _ := strconv.Atoi(dt[1])
-				// s, _ := strconv.Atoi(dt[2])
-				// tt := time.Date(now.Year(), now.Month(), now.Day(), h, m, s, 0, loc)
-				// deviation within 2 minutes
-				// sub := now.Sub(tt).Minutes()
-				// if sub > -2 && sub < 2 {
-				// 	plusPoint(db, 4, t)
+				// patch
+				// if dtime != "" {
+				// 	log.Println("[+] Time", dtime)
+				// 	plusPoint(db, 4, t, ischeck)
 				// } else {
-				// 	log.Println("[-] Time deviation", sub)
 				// 	srvDown(db, 4, t)
 				// }
-
 			} else {
 				srvDown(db, 4, t)
 			}
