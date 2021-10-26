@@ -36,6 +36,16 @@
       background-color: #04AA6D;
       color: white;
     }
+
+
+    table tr.success {
+      background-color: #dff0d8;
+    }
+    
+    table tr.fail {
+      background-color: #f2dede;
+    }
+    
     </style>
 </head>
 <body>
@@ -47,7 +57,7 @@
       <th>Log</th>
     </tr>
   {{range .Events}}
-    <tr>
+    <tr class="{{if (gt .Point 0) }}success{{else if (lt .Point 0)}}fail{{end}}">
       <td><div>{{.CreatedAt}}</div></td>
       <td>{{.Name}}</td>
       <td>{{.Point}}</td>
