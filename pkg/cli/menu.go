@@ -17,7 +17,7 @@ import (
 
 var status = false
 var duration = 5 * time.Minute
-var duration2 = 15 * time.Second
+var duration2 = 30 * time.Second
 
 func svc() string {
 	if status {
