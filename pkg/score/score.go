@@ -16,6 +16,7 @@ func Scoring(db *gorm.DB, ticker, ticker2 *time.Ticker, quit chan bool) {
 	// q3 := helper.ReadQ1("data/quest3.csv")
 	// q4 := helper.ReadQ1("data/quest4.csv")
 	// q5 := helper.ReadQ1("data/quest5.csv")
+	q6 := helper.ReadQ1("data/quest6.csv")
 	q7 := helper.ReadQ1("data/quest7.csv")
 	for {
 		select {
@@ -25,6 +26,8 @@ func Scoring(db *gorm.DB, ticker, ticker2 *time.Ticker, quit chan bool) {
 			// go quest.OA(db, q3, true)
 			// go quest.Stack(db, q4, true)
 			// go quest.News(db, q5, true)
+			go quest.Blog(db, q6, false)
+			go quest.Blog(db, q7, false)
 
 		case <-ticker.C:
 			// 10/26
@@ -35,6 +38,7 @@ func Scoring(db *gorm.DB, ticker, ticker2 *time.Ticker, quit chan bool) {
 			// go quest.News(db, q5, false)
 
 			// 10/28
+			go quest.Blog(db, q6, false)
 			go quest.Blog(db, q7, false)
 
 		case <-quit:
