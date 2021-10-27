@@ -6,7 +6,6 @@ require (
 	github.com/AlecAivazis/survey/v2 v2.3.2
 	github.com/gin-gonic/gin v1.7.4
 	github.com/olekukonko/tablewriter v0.0.5
-	gorm.io/driver/sqlite v1.1.6
 	gorm.io/gorm v1.21.16
 )
 
@@ -21,7 +20,6 @@ require (
 	github.com/jackc/pgx/v4 v4.13.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.2 // indirect
-	github.com/mattn/go-sqlite3 v1.14.9 // indirect
 )
 
 require (
@@ -39,7 +37,7 @@ require (
 	github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
-	github.com/tidwall/gjson v1.10.1 // indirect
+	github.com/tidwall/gjson v1.10.1
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/ugorji/go/codec v1.2.6 // indirect
