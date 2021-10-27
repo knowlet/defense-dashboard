@@ -54,12 +54,14 @@
       <td colspan="6" style="text-align: center;">Service</td>
     </tr>
     {{range .statuses}}
-    <tr>
-      <td>{{ (index . 1).Tname }}</td>
-      {{range .}}
-      <td class="{{if .Alive}}success{{else}}fail{{end}}">{{.Qname}} [{{.CreatedAt.Format "15:04:05"}}]</td>
+      {{if .}}
+      <tr>
+        <td>{{ (index . 0).Tname }}</td>
+        {{range .}}
+        <td class="{{if .Alive}}success{{else}}fail{{end}}">{{.Qname}} [{{.CreatedAt.Format "15:04:05"}}]</td>
+        {{end}}
+      </tr>
       {{end}}
-    </tr>
     {{end}}
   </table>
 </body>
