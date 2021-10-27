@@ -190,6 +190,9 @@ func Menu(db *gorm.DB, quit chan bool) {
 				}
 				ids = append(ids, id)
 			}
+			if (ids == nil) || (len(ids) == 0) {
+				break
+			}
 			db.Delete(&model.Event{}, ids)
 
 		default: // exit
