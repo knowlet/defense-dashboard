@@ -6,7 +6,7 @@ require (
 	github.com/AlecAivazis/survey/v2 v2.3.2
 	github.com/gin-gonic/gin v1.7.4
 	github.com/olekukonko/tablewriter v0.0.5
-	gorm.io/gorm v1.21.16
+	gorm.io/gorm v1.22.0
 )
 
 require (
