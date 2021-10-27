@@ -102,12 +102,42 @@ func (h Controller) TeamViewLogsHandler(c *gin.Context) {
 	})
 }
 
-func TeamBoardHandler(c *gin.Context) {
-	c.HTML(http.StatusOK, "board.html", gin.H{})
+// team/status
+func (h Controller) TeamViewStatusHandler(c *gin.Context) {
+	nolimit := c.Query("nolimit")
+	norefresh := c.Query("norefresh")
+	limit := 72
+	refresh := true
+	if nolimit != "" {
+		limit = 0
+	}
+	if norefresh != "" {
+		refresh = false
+	}
+	queryModel := []struct {
+		CreatedAt time.Time
+		Alive     bool
+		Name      string
+		Qname     string
+	}{}
+	if err := h.DB.Select("statuses.id, alive, team_id, quest_id, teams.name, quests.name as qname, statuses.created_at").
+		Model(&model.Status{}).
+		Joins("left join teams on statuses.team_id = teams.id").
+		Joins("left join quests on statuses.quest_id = quests.id").
+		Order("created_at DESC").
+		Limit(limit).
+		Find(&queryModel).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "cannot log status"})
+		return
+	}
+	c.HTML(http.StatusOK, "status.html", gin.H{
+		"Statuses":  queryModel,
+		"NoRefresh": refresh,
+	})
 }
 
 // team/status
-func (h Controller) TeamViewStatusHandler(c *gin.Context) {
+func (h Controller) BoardStatusHandler(c *gin.Context) {
 	nolimit := c.Query("nolimit")
 	norefresh := c.Query("norefresh")
 	limit := 72
