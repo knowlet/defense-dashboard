@@ -151,11 +151,10 @@ func Menu(db *gorm.DB, quit chan bool) {
 
 				log.Println("[-]", team, points, "reason:", reason)
 				// save to db
-				db.Create(&model.Event{
-					Log:     fmt.Sprintf("[-] %s %s score %s", t.Name, reason, p),
-					Point:   points,
-					TeamID:  t.ID,
-					QuestID: 0,
+				db.Omit("quest_id").Create(&model.Event{
+					Log:    fmt.Sprintf("[-] %s %s score %s", t.Name, reason, p),
+					Point:  points,
+					TeamID: t.ID,
 				})
 			}
 
