@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -21,8 +21,8 @@ func main() {
 	// Set log to stderr
 	log.SetOutput(os.Stderr)
 
-	// Open the data.db file. It will be created if it doesn't exist.
-	db, err := gorm.Open(sqlite.Open("data.db"), &gorm.Config{
+	dsn := "host=localhost user=postgres password=hitcon-defense-2021 dbname=gorm port=5432 sslmode=disable TimeZone=Asia/Taipei"
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		// Logger: logger.Default.LogMode(logger.Info),
 	})
 	if err != nil {
