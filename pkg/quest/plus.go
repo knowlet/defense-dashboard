@@ -23,7 +23,7 @@ func getInfo(db *gorm.DB, qID, tID uint) (string, string) {
 }
 
 func plusPoint(db *gorm.DB, qID, tID uint) {
-	tName, qName := getInfo(db, tID, qID)
+	tName, qName := getInfo(db, qID, tID)
 
 	// save to db
 	db.Create(&model.Event{
@@ -36,7 +36,7 @@ func plusPoint(db *gorm.DB, qID, tID uint) {
 }
 
 func srvDown(db *gorm.DB, qID, tID uint) {
-	tName, qName := getInfo(db, tID, qID)
+	tName, qName := getInfo(db, qID, tID)
 
 	// save to db
 	db.Create(&model.Event{
@@ -49,7 +49,7 @@ func srvDown(db *gorm.DB, qID, tID uint) {
 }
 
 func checkservice(db *gorm.DB, qID, tID uint, alive bool) {
-	tName, qName := getInfo(db, tID, qID)
+	tName, qName := getInfo(db, qID, tID)
 
 	// save to db
 	mylog := ""
