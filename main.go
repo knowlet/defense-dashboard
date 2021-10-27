@@ -64,7 +64,7 @@ func main() {
 	t.GET("/status", route.Controller{DB: db}.TeamViewStatusHandler)
 	b := r.Group("/board")
 	b.GET("/", route.TeamBoardHandler)
-	b.GET("/status", route.TeamStatusHandler)
+	b.GET("/status", route.Controller{DB: db}.TeamStatusHandler)
 
 	srv := &http.Server{
 		Addr:    ":8080",
