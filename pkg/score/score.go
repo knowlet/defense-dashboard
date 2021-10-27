@@ -57,6 +57,7 @@ func Scoring(db *gorm.DB, ticker, ticker2 *time.Ticker, quit chan bool) {
 		case <-quit:
 			ticker.Stop()
 			ticker2.Stop()
+			return
 		}
 	}
 }
