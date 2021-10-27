@@ -59,8 +59,8 @@ func checkservice(db *gorm.DB, qID, tID uint, alive bool) {
 		mylog = fmt.Sprintf("[-] %s %s service down", tName, qName)
 	}
 
-	db.Create(&model.Event{
-		Log:     mylog,
+	db.Create(&model.Status{
+		Alive:   alive,
 		TeamID:  tID,
 		QuestID: qID,
 	})

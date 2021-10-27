@@ -34,6 +34,7 @@ func main() {
 		model.Team{},
 		model.Quest{},
 		model.Event{},
+		model.Status{},
 	)
 
 	// Seed team data from file
