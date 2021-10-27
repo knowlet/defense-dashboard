@@ -33,7 +33,7 @@ func Exchange(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 
 			// querystring
 			data := url.Values{}
-			data.Set("destination", fmt.Sprintf("https://%s/owa/auth.owa", t["hostname"]))
+			data.Set("destination", fmt.Sprintf("https://%s/owa", t["hostname"]))
 			data.Set("flags", "4")
 			data.Set("forcedownlevel", "0")
 			data.Set("username", "JamesHarden@blueteam1.defense.hitcon")
