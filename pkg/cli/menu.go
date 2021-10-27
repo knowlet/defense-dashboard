@@ -149,13 +149,19 @@ func Menu(db *gorm.DB, quit chan bool) {
 					break
 				}
 
-				log.Println("[-]", team, points, "reason:", reason)
+				mylog := "[-]"
+				if points > 0 {
+					mylog = "[+]"
+				}
 				// save to db
-				db.Omit("quest_id").Create(&model.Event{
-					Log:    fmt.Sprintf("[-] %s %s score %s", t.Name, reason, p),
+				if err := db.Omit("quest_id").Create(&model.Event{
+					Log:    fmt.Sprintf("%s %s %s score %s", mylog, t.Name, reason, p),
 					Point:  points,
 					TeamID: t.ID,
-				})
+				}); err != nil {
+					log.Println("[-]", err)
+				}
+				log.Println(mylog, team, points, "reason:", reason)
 			}
 
 		case prompt.Options[3]: // delete logs
