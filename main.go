@@ -60,6 +60,7 @@ func main() {
 	t.GET("/:id", route.Controller{DB: db}.TeamHandler)
 	t.GET("/view", route.TeamViewHandler)
 	t.GET("/events", route.Controller{DB: db}.TeamViewLogsHandler)
+	t.GET("/status", route.Controller{DB: db}.TeamViewStatusHandler)
 	r.GET("/board", route.TeamBoardHandler)
 
 	srv := &http.Server{
