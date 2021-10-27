@@ -1,6 +1,7 @@
 package score
 
 import (
+	"log"
 	"time"
 
 	"defense-dashboard/pkg/helper"
@@ -24,6 +25,7 @@ func Scoring(db *gorm.DB, ticker, ticker2 *time.Ticker, quit chan bool) {
 	for {
 		select {
 		case <-ticker2.C: // check only
+			log.Println("[+] health check start")
 			// 10/26
 			// go quest.Subversion(db, q1, true)
 			go quest.Exchange(db, q2, true)
@@ -32,12 +34,13 @@ func Scoring(db *gorm.DB, ticker, ticker2 *time.Ticker, quit chan bool) {
 			// go quest.News(db, q5, true)
 
 			// 10/28
-			go quest.Chk(db, q6, false)
-			go quest.Blog(db, q7, false)
-			go quest.Git(db, q8, false)
-			go quest.Chat(db, q9, false)
+			go quest.Chk(db, q6, true)
+			go quest.Blog(db, q7, true)
+			go quest.Git(db, q8, true)
+			go quest.Chat(db, q9, true)
 
 		case <-ticker.C:
+			log.Println("[+] scoring check start")
 			// 10/26
 			// go quest.Subversion(db, q1, false)
 			go quest.Exchange(db, q2, false)
