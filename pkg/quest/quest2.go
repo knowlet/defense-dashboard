@@ -22,12 +22,12 @@ func Exchange(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 				t["hostname"].(string), nil, nil)
 			if err != nil {
 				log.Println("[-]", err) // cancel caught
-				srvDown(db, 2, t)
+				healthcheck(db, quest2, t["id"].(uint), ischeck, false)
 				return
 			}
 			defer resp1.Body.Close()
 			if resp1.StatusCode != http.StatusOK {
-				srvDown(db, 2, t)
+				healthcheck(db, quest2, t["id"].(uint), ischeck, false)
 				return
 			}
 
@@ -51,7 +51,7 @@ func Exchange(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 				strings.NewReader(data.Encode()), nil)
 			if err != nil {
 				log.Println("[-]", err) // cancel caught
-				srvDown(db, 2, t)
+				healthcheck(db, quest2, t["id"].(uint), ischeck, false)
 				return
 			}
 			defer resp.Body.Close()
@@ -61,17 +61,13 @@ func Exchange(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 				url, err := resp.Location()
 				if err != nil {
 					log.Println("[-]", err)
-					srvDown(db, 2, t)
+					healthcheck(db, quest2, t["id"].(uint), ischeck, false)
 					return
 				}
-				// if url.Path == "/owa" {
-				if url.Path != "" {
-					plusPoint(db, 2, t, ischeck)
-				} else {
-					srvDown(db, 2, t)
-				}
+				healthcheck(db, quest2, t["id"].(uint), ischeck, url.Path == "/owa")
+				// healthcheck(db, quest2, t["id"].(uint), ischeck, url.Path != "")
 			} else {
-				srvDown(db, 2, t)
+				healthcheck(db, quest2, t["id"].(uint), ischeck, false)
 			}
 		}(team)
 	}

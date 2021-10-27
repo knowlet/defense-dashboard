@@ -8,10 +8,10 @@ import (
 	"gorm.io/gorm"
 )
 
-func plusPoint(db *gorm.DB, qID uint, t map[string]interface{}, ischeck bool) {
+func getInfo(db *gorm.DB, qID, tID uint) (string, string) {
 	// read team info
 	team := model.Team{}
-	if err := db.First(&team, t["id"]).Error; err != nil {
+	if err := db.First(&team, tID).Error; err != nil {
 		log.Fatal(err)
 	}
 	// read quest info
@@ -19,44 +19,61 @@ func plusPoint(db *gorm.DB, qID uint, t map[string]interface{}, ischeck bool) {
 	if err := db.First(&quest, qID).Error; err != nil {
 		log.Fatal(err)
 	}
-	// save to db
-	if ischeck {
-
-		db.Create(&model.Event{
-			Log:     fmt.Sprintf("[+] %s %s service alive", team.Name, quest.Name),
-			Point:   0,
-			TeamID:  team.ID,
-			QuestID: qID,
-		})
-		log.Println("[+]", team.Name, quest.Name, "service alive")
-	} else {
-		db.Create(&model.Event{
-			Log:     fmt.Sprintf("[+] %s service alive %s score +%d", quest.Name, team.Name, plus),
-			Point:   plus,
-			TeamID:  team.ID,
-			QuestID: qID,
-		})
-		log.Println("[+]", team.Name, quest.Name, plus)
-	}
+	return team.Name, quest.Name
 }
 
-func srvDown(db *gorm.DB, qID uint, t map[string]interface{}) {
-	// read team info
-	team := model.Team{}
-	if err := db.First(&team, t["id"]).Error; err != nil {
-		log.Fatal(err)
-	}
-	// read quest info
-	quest := model.Quest{}
-	if err := db.First(&quest, qID).Error; err != nil {
-		log.Fatal(err)
-	}
+func plusPoint(db *gorm.DB, qID, tID uint) {
+	tName, qName := getInfo(db, tID, qID)
+
 	// save to db
 	db.Create(&model.Event{
-		Log:     fmt.Sprintf("[-] %s service down %s score +0", quest.Name, team.Name),
-		Point:   0,
-		TeamID:  team.ID,
+		Log:     fmt.Sprintf("[+] %s %s service alive +%d", tName, qName, plus),
+		Point:   plus,
+		TeamID:  tID,
 		QuestID: qID,
 	})
-	log.Println("[-]", team.Name, quest.Name, 0)
+	log.Println("[+]", tName, qName, plus)
+}
+
+func srvDown(db *gorm.DB, qID, tID uint) {
+	tName, qName := getInfo(db, tID, qID)
+
+	// save to db
+	db.Create(&model.Event{
+		Log:     fmt.Sprintf("[-] %s %s service down +0", tName, qName),
+		Point:   0,
+		TeamID:  tID,
+		QuestID: qID,
+	})
+	log.Println("[-]", tName, qName, 0)
+}
+
+func checkservice(db *gorm.DB, qID, tID uint, alive bool) {
+	tName, qName := getInfo(db, tID, qID)
+
+	// save to db
+	mylog := ""
+	if alive {
+		mylog = fmt.Sprintf("[+] %s %s service alive", tName, qName)
+	} else {
+		mylog = fmt.Sprintf("[-] %s %s service down", tName, qName)
+	}
+
+	db.Create(&model.Event{
+		Log:     mylog,
+		TeamID:  tID,
+		QuestID: qID,
+	})
+	log.Println(mylog)
+}
+
+func healthcheck(db *gorm.DB, qID, tID uint, ischeck, isup bool) {
+	switch {
+	case ischeck:
+		checkservice(db, qID, tID, isup)
+	case !ischeck && isup:
+		plusPoint(db, qID, tID)
+	case !ischeck && !isup:
+		srvDown(db, qID, tID)
+	}
 }

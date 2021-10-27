@@ -61,11 +61,7 @@ func Blog(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 						log.Println("[-]", err) // cancel caught
 						return
 					}
-					if strings.Contains(string(body), verfy[:50]) {
-						plusPoint(db, 7, t, ischeck)
-					} else {
-						srvDown(db, 7, t)
-					}
+					healthcheck(db, quest7, t["id"].(uint), ischeck, strings.Contains(string(body), verfy[:50]))
 				}
 			}
 		}(team)

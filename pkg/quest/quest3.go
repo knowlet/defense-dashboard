@@ -20,17 +20,13 @@ func OA(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 				t["hostname"].(string), nil, nil)
 			if err != nil {
 				log.Println("[-]", err) // cancel caught
-				srvDown(db, 3, t)
+				healthcheck(db, quest3, t["id"].(uint), ischeck, false)
 				return
 			}
 			defer resp.Body.Close()
 			log.Println("[+]", resp.Request.URL.String())
 			log.Println("[+] Response", resp.Status)
-			if resp.StatusCode == http.StatusOK {
-				plusPoint(db, 3, t, ischeck)
-			} else {
-				srvDown(db, 3, t)
-			}
+			healthcheck(db, quest3, t["id"].(uint), ischeck, resp.StatusCode == http.StatusOK)
 		}(team)
 	}
 }

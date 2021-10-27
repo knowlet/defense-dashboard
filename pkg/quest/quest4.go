@@ -32,7 +32,7 @@ func Stack(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 				strings.NewReader(`{"output":{"id":"graphs_Container","property":"children"},"event":"interval"}`))
 			if err != nil {
 				log.Println("[-]", err) // cancel caught
-				srvDown(db, 4, t)
+				healthcheck(db, quest4, t["id"].(uint), ischeck, false)
 				return
 			}
 			defer resp.Body.Close()
@@ -43,7 +43,7 @@ func Stack(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 				body, err := io.ReadAll(resp.Body)
 				if err != nil {
 					log.Println("[-]", err)
-					srvDown(db, 4, t)
+					healthcheck(db, quest4, t["id"].(uint), ischeck, false)
 					return
 				}
 				json := string(body)
@@ -62,22 +62,11 @@ func Stack(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 				tt := time.Date(now.Year(), now.Month(), now.Day(), h, m, s, 0, loc)
 				// deviation within 2 minutes
 				sub := now.Sub(tt).Minutes()
-				if sub > -2 && sub < 2 {
-					plusPoint(db, 4, t, ischeck)
-				} else {
-					log.Println("[-] Time deviation", sub)
-					srvDown(db, 4, t)
-				}
-
-				// patch
-				// if dtime != "" {
-				// 	log.Println("[+] Time", dtime)
-				// 	plusPoint(db, 4, t, ischeck)
-				// } else {
-				// 	srvDown(db, 4, t)
-				// }
+				log.Println("[+] Time deviation", sub)
+				healthcheck(db, quest4, t["id"].(uint), ischeck, sub > -2 && sub < 2)
+				// healthcheck(db, quest4, t["id"].(uint), ischeck, dtime != "")
 			} else {
-				srvDown(db, 4, t)
+				healthcheck(db, quest4, t["id"].(uint), ischeck, false)
 			}
 		}(team)
 	}

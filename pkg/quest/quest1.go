@@ -22,7 +22,7 @@ func Subversion(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 				nil, nil)
 			if err != nil {
 				log.Println("[-]", err) // cancel caught
-				srvDown(db, 1, t)
+				healthcheck(db, quest1, t["id"].(uint), ischeck, false)
 				return
 			}
 			defer resp.Body.Close()
@@ -31,18 +31,14 @@ func Subversion(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 				body, err := io.ReadAll(resp.Body)
 				if err != nil {
 					log.Println("[-]", err)
-					srvDown(db, 1, t)
+					healthcheck(db, quest1, t["id"].(uint), ischeck, false)
 					return
 				}
 
 				// check keywords
-				if strings.Contains(string(body), "WebSVN") {
-					plusPoint(db, 1, t, ischeck)
-				} else {
-					srvDown(db, 1, t)
-				}
+				healthcheck(db, quest1, t["id"].(uint), ischeck, strings.Contains(string(body), "WebSVN"))
 			} else {
-				srvDown(db, 1, t)
+				healthcheck(db, quest1, t["id"].(uint), ischeck, false)
 			}
 		}(team)
 	}
