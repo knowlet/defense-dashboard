@@ -53,13 +53,14 @@ func Stack(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 				dtime := dRexp.FindString(value.String())
 				// get current time
 				now := time.Now()
-				log.Println(now)
+				log.Println("[+]", now)
 
 				dt := strings.Split(dtime, ":")
 				h, _ := strconv.Atoi(dt[0])
 				m, _ := strconv.Atoi(dt[1])
 				s, _ := strconv.Atoi(dt[2])
 				tt := time.Date(now.Year(), now.Month(), now.Day(), h, m, s, 0, loc)
+				log.Println("[+]", tt)
 				// deviation within 2 minutes
 				sub := now.Sub(tt).Minutes()
 				log.Println("[+] Time deviation", sub)
