@@ -31,18 +31,18 @@ func Stack(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 				t["hostname"].(string),
 				strings.NewReader(`{"output":{"id":"graphs_Container","property":"children"},"event":"interval"}`))
 			if err != nil {
-				log.Println(err) // cancel caught
+				log.Println("[-]", err) // cancel caught
 				srvDown(db, 4, t)
 				return
 			}
 			defer resp.Body.Close()
-			log.Println(resp.Request.URL.String())
+			log.Println("[+]", resp.Request.URL.String())
 			log.Println("[+] Response", resp.Status)
 			if resp.StatusCode == http.StatusOK {
 				// read body
 				body, err := io.ReadAll(resp.Body)
 				if err != nil {
-					log.Println(err)
+					log.Println("[-]", err)
 					srvDown(db, 4, t)
 					return
 				}

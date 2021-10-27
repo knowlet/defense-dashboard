@@ -37,11 +37,11 @@ func Blog(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 					"status": "publish"
 			}`, verfy)))
 			if err != nil {
-				log.Println(err) // cancel caught
+				log.Println("[-]", err) // cancel caught
 				return
 			}
 			defer resp.Body.Close()
-			log.Println(resp.Request.URL.String())
+			log.Println("[+]", resp.Request.URL.String())
 			log.Println("[+] Response", resp.Status)
 			if resp.StatusCode == http.StatusCreated {
 				resp2, err := request(
@@ -50,7 +50,7 @@ func Blog(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 					t["hostname"].(string),
 					nil, nil)
 				if err != nil {
-					log.Println(err) // cancel caught
+					log.Println("[-]", err) // cancel caught
 					return
 				}
 				defer resp2.Body.Close()
@@ -58,7 +58,7 @@ func Blog(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 					// read body
 					body, err := ioutil.ReadAll(resp2.Body)
 					if err != nil {
-						log.Println(err) // cancel caught
+						log.Println("[-]", err) // cancel caught
 						return
 					}
 					if strings.Contains(string(body), verfy[:50]) {

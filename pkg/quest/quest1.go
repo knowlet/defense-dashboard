@@ -21,7 +21,7 @@ func Subversion(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 				t["hostname"].(string),
 				nil, nil)
 			if err != nil {
-				log.Println(err) // cancel caught
+				log.Println("[-]", err) // cancel caught
 				srvDown(db, 1, t)
 				return
 			}
@@ -30,7 +30,7 @@ func Subversion(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 				// read body
 				body, err := io.ReadAll(resp.Body)
 				if err != nil {
-					log.Println(err)
+					log.Println("[-]", err)
 					srvDown(db, 1, t)
 					return
 				}

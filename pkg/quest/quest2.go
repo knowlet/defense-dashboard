@@ -21,7 +21,7 @@ func Exchange(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 				fmt.Sprintf("https://%s/owa/auth/logon.aspx?replaceCurrent=1&url=", t["ip"]),
 				t["hostname"].(string), nil, nil)
 			if err != nil {
-				log.Println(err) // cancel caught
+				log.Println("[-]", err) // cancel caught
 				srvDown(db, 2, t)
 				return
 			}
@@ -50,17 +50,17 @@ func Exchange(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 				t["hostname"].(string),
 				strings.NewReader(data.Encode()), nil)
 			if err != nil {
-				log.Println(err) // cancel caught
+				log.Println("[-]", err) // cancel caught
 				srvDown(db, 2, t)
 				return
 			}
 			defer resp.Body.Close()
-			log.Println(resp.Request.URL.String())
+			log.Println("[+]", resp.Request.URL.String())
 			log.Println("[+] Response", resp.Status)
 			if resp.StatusCode == http.StatusFound {
 				url, err := resp.Location()
 				if err != nil {
-					log.Println(err)
+					log.Println("[-]", err)
 					srvDown(db, 2, t)
 					return
 				}

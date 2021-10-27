@@ -50,12 +50,12 @@ func Menu(db *gorm.DB, quit chan bool) {
 			if check {
 				status = !status
 				if status { // start
-					log.Println("Starting scoring service")
+					log.Println("[+] Starting scoring service")
 					ticker := time.NewTicker(duration)
 					ticker2 := time.NewTicker(duration2)
 					go score.Scoring(db, ticker, ticker2, stop)
 				} else { // stop
-					log.Println("Stopping scoring service")
+					log.Println("[-] Stopping scoring service")
 					stop <- true
 				}
 			}
@@ -63,7 +63,7 @@ func Menu(db *gorm.DB, quit chan bool) {
 			queryModel := []model.Team{}
 			err := db.Find(&queryModel).Error
 			if err != nil {
-				fmt.Println(err)
+				fmt.Println("[-]", err)
 				break
 			}
 			table := tablewriter.NewWriter(os.Stdout)
@@ -85,20 +85,25 @@ func Menu(db *gorm.DB, quit chan bool) {
 			queryModel := []model.Team{}
 			err := db.Find(&queryModel).Error
 			if err != nil {
-				fmt.Println(err)
+				fmt.Println("[-]", err)
 				break
 			}
 
+			// Choose reason
+			reason := ""
+			prompt3 := &survey.Input{Message: "Why"}
+			survey.AskOne(prompt3, &reason)
+
 			// Choose team
-			prompt1 := &survey.Select{
+			prompt1 := &survey.MultiSelect{
 				Message: "Choose Team:",
 				Options: []string{},
 			}
 			for _, t := range queryModel {
 				prompt1.Options = append(prompt1.Options, t.Name)
 			}
-			team := ""
-			survey.AskOne(prompt1, &team, survey.WithValidator(survey.Required))
+			teams := []string{}
+			survey.AskOne(prompt1, &teams, survey.WithValidator(survey.Required))
 
 			// Choose minus points
 			prompt2 := &survey.Select{
@@ -114,51 +119,50 @@ func Menu(db *gorm.DB, quit chan bool) {
 				survey.AskOne(manual, &p)
 			}
 
-			// read team
-			t := model.Team{}
-			if err := db.Preload("Events").Where("name = ?", team).Find(&t).Error; err != nil {
-				log.Println(err)
-				break
-			}
-
-			// check if is persent
-			points := 0
-			if strings.Contains(p, "%") {
-				// get persent
-				points, err = strconv.Atoi(p[:strings.Index(p, "%")])
-				if err != nil {
-					log.Println(err)
+			for _, team := range teams {
+				// read team
+				t := model.Team{}
+				if err := db.Preload("Events").Where("name = ?", team).Find(&t).Error; err != nil {
+					log.Println("[-]", err)
 					break
 				}
-				// sum score
-				score := 0
-				for _, e := range t.Events {
-					score += e.Point
+
+				// check if is persent
+				points := 0
+				if strings.Contains(p, "%") {
+					// get persent
+					points, err = strconv.Atoi(p[:strings.Index(p, "%")])
+					if err != nil {
+						log.Println("[-]", err)
+						break
+					}
+					// sum score
+					score := 0
+					for _, e := range t.Events {
+						score += e.Point
+					}
+					points = score * points / 100
+				} else {
+					points, _ = strconv.Atoi(p)
 				}
-				points = score * points / 100
-			} else {
-				points, _ = strconv.Atoi(p)
+				if err != nil || points == 0 {
+					break
+				}
+
+				log.Println("[-]", team, points, "reason:", reason)
+				// save to db
+				db.Create(&model.Event{
+					Log:     fmt.Sprintf("[-] %s %s score %s", t.Name, reason, p),
+					Point:   points,
+					TeamID:  t.ID,
+					QuestID: 0,
+				})
 			}
-			if err != nil || points == 0 {
-				break
-			}
-			// Choose reason
-			reason := ""
-			prompt3 := &survey.Input{Message: "Why"}
-			survey.AskOne(prompt3, &reason)
-			log.Println(team, points, "points cause of", reason)
-			// save to db
-			db.Create(&model.Event{
-				Log:     fmt.Sprintf("[-] %s %s score %s", t.Name, reason, p),
-				Point:   points,
-				TeamID:  t.ID,
-				QuestID: 0,
-			})
 
 		case prompt.Options[3]: // delete logs
 			queryModel := []model.Event{}
 			if err := db.Find(&queryModel).Order("created_at DESC").Error; err != nil {
-				log.Println(err)
+				log.Println("[-]", err)
 				break
 			}
 			opts := []string{}
@@ -176,7 +180,7 @@ func Menu(db *gorm.DB, quit chan bool) {
 			for _, l := range logs {
 				id, err := strconv.Atoi(l[:strings.Index(l, ":")])
 				if err != nil {
-					log.Println(err)
+					log.Println("[-]", err)
 					continue
 				}
 				ids = append(ids, id)

@@ -33,7 +33,6 @@ func Chat(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 		go func(t map[string]interface{}) {
 			// generate random message
 			message := helper.RandomString()
-			log.Println("message:", message)
 			mac := hmac.New(sha256.New, []byte("HITCON_DEFENSE_2021"))
 			mac.Write([]byte(message))
 			expectedMAC := mac.Sum(nil)
@@ -55,12 +54,12 @@ func Chat(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 					t["hostname"].(string),
 					strings.NewReader(data.Encode()), nil)
 				if err != nil {
-					log.Println(err) // cancel caught
+					log.Println("[-]", err) // cancel caught
 					srvDown(db, 5, t)
 					return
 				}
 				defer resp.Body.Close()
-				log.Println(resp.Request.URL.String())
+				log.Println("[+]", resp.Request.URL.String())
 				log.Println("[+] Response", resp.Status)
 				if resp.StatusCode == http.StatusOK {
 					// get first line

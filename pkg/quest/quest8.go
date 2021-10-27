@@ -23,7 +23,7 @@ func Git(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 			// check login page
 			jar, err := cookiejar.New(nil)
 			if err != nil {
-				log.Println(err)
+				log.Println("[-]", err)
 				return
 			}
 			resp1, err := request(
@@ -31,7 +31,7 @@ func Git(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 				fmt.Sprintf("http://%s/users/sign_in", t["ip"]),
 				t["hostname"].(string), nil, jar)
 			if err != nil {
-				log.Println(err) // cancel caught
+				log.Println("[-]", err) // cancel caught
 				srvDown(db, quest8, t)
 				return
 			}
@@ -43,7 +43,7 @@ func Git(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 
 			body, err := io.ReadAll(resp1.Body)
 			if err != nil {
-				log.Println(err)
+				log.Println("[-]", err)
 				srvDown(db, quest8, t)
 				return
 			}
@@ -74,7 +74,7 @@ func Git(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 				t["hostname"].(string),
 				strings.NewReader(data.Encode()), jar)
 			if err != nil {
-				log.Println(err) // cancel caught
+				log.Println("[-]", err) // cancel caught
 				srvDown(db, quest8, t)
 				return
 			}
@@ -84,7 +84,7 @@ func Git(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 			if resp.StatusCode == http.StatusFound {
 				url, err := resp.Location()
 				if err != nil {
-					log.Println(err)
+					log.Println("[-]", err)
 					srvDown(db, quest8, t)
 					return
 				}

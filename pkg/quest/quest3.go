@@ -19,12 +19,12 @@ func OA(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 				fmt.Sprintf("http://%s/icehrm/app/data/value_Ms7u5RZUJbAv9M1634992053374.png", t["ip"]),
 				t["hostname"].(string), nil, nil)
 			if err != nil {
-				log.Println(err) // cancel caught
+				log.Println("[-]", err) // cancel caught
 				srvDown(db, 3, t)
 				return
 			}
 			defer resp.Body.Close()
-			log.Println(resp.Request.URL.String())
+			log.Println("[+]", resp.Request.URL.String())
 			log.Println("[+] Response", resp.Status)
 			if resp.StatusCode == http.StatusOK {
 				plusPoint(db, 3, t, ischeck)

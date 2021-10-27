@@ -58,5 +58,5 @@ func srvDown(db *gorm.DB, qID uint, t map[string]interface{}) {
 		TeamID:  team.ID,
 		QuestID: qID,
 	})
-	log.Println("[-]", quest.Name, team.Name, 0)
+	log.Println("[-]", team.Name, quest.Name, 0)
 }
