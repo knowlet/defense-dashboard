@@ -7,6 +7,7 @@ import (
 	"defense-dashboard/pkg/helper"
 	"defense-dashboard/pkg/route"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -84,6 +85,7 @@ func main() {
 			log.Fatal("[-] Server forced to shutdown:", err)
 		}
 		log.Println("[+] Server exiting")
+		fmt.Fprint(os.Stdout, "\x1b[?25h")
 		return
 	}
 }
