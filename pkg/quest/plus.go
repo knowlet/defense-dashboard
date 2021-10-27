@@ -67,13 +67,13 @@ func checkservice(db *gorm.DB, qID, tID uint, alive bool) {
 	log.Println(mylog)
 }
 
-func healthcheck(db *gorm.DB, qID, tID uint, ischeck, isup bool) {
+func healthcheck(db *gorm.DB, qID uint, tID int, ischeck, isup bool) {
 	switch {
 	case ischeck:
-		checkservice(db, qID, tID, isup)
+		checkservice(db, qID, uint(tID), isup)
 	case !ischeck && isup:
-		plusPoint(db, qID, tID)
+		plusPoint(db, qID, uint(tID))
 	case !ischeck && !isup:
-		srvDown(db, qID, tID)
+		srvDown(db, qID, uint(tID))
 	}
 }

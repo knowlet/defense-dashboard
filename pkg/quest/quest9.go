@@ -55,7 +55,7 @@ func Chat(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 					strings.NewReader(data.Encode()), nil)
 				if err != nil {
 					log.Println("[-]", err) // cancel caught
-					healthcheck(db, quest9, t["id"].(uint), ischeck, false)
+					healthcheck(db, quest9, t["id"].(int), ischeck, false)
 					return
 				}
 				defer resp.Body.Close()
@@ -65,7 +65,7 @@ func Chat(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 					// get first line
 					scanner := bufio.NewScanner(resp.Body)
 					if err != nil {
-						healthcheck(db, quest9, t["id"].(uint), ischeck, false)
+						healthcheck(db, quest9, t["id"].(int), ischeck, false)
 						return
 					}
 					scanner.Scan()
@@ -74,7 +74,7 @@ func Chat(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 					// read hmac sha256
 					messageMAC, err := hex.DecodeString(line)
 					if err != nil {
-						healthcheck(db, quest9, t["id"].(uint), ischeck, false)
+						healthcheck(db, quest9, t["id"].(int), ischeck, false)
 						return
 					}
 					log.Println("[+] Message MAC:", messageMAC)
@@ -85,11 +85,11 @@ func Chat(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 						log.Println("[+]", t["ip"], path, "check:", check)
 					}
 				} else {
-					healthcheck(db, quest9, t["id"].(uint), ischeck, false)
+					healthcheck(db, quest9, t["id"].(int), ischeck, false)
 					return
 				}
 			}
-			healthcheck(db, quest9, t["id"].(uint), ischeck, check == len(pathsChat))
+			healthcheck(db, quest9, t["id"].(int), ischeck, check == len(pathsChat))
 		}(team)
 	}
 }

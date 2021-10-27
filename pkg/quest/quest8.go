@@ -30,19 +30,19 @@ func Git(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 				t["hostname"].(string), nil, jar)
 			if err != nil {
 				log.Println("[-]", err) // cancel caught
-				healthcheck(db, quest8, t["id"].(uint), ischeck, false)
+				healthcheck(db, quest8, t["id"].(int), ischeck, false)
 				return
 			}
 			defer resp1.Body.Close()
 			if resp1.StatusCode != http.StatusOK {
-				healthcheck(db, quest8, t["id"].(uint), ischeck, false)
+				healthcheck(db, quest8, t["id"].(int), ischeck, false)
 				return
 			}
 
 			body, err := io.ReadAll(resp1.Body)
 			if err != nil {
 				log.Println("[-]", err)
-				healthcheck(db, quest8, t["id"].(uint), ischeck, false)
+				healthcheck(db, quest8, t["id"].(int), ischeck, false)
 				return
 			}
 
@@ -51,7 +51,7 @@ func Git(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 			sub := rexp.FindStringSubmatch(string(body))
 			if len(sub) < 2 {
 				log.Println("[-] csrf-token not found")
-				healthcheck(db, quest8, t["id"].(uint), ischeck, false)
+				healthcheck(db, quest8, t["id"].(int), ischeck, false)
 				return
 			}
 			csrf := sub[1]
@@ -73,7 +73,7 @@ func Git(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 				strings.NewReader(data.Encode()), jar)
 			if err != nil {
 				log.Println("[-]", err) // cancel caught
-				healthcheck(db, quest8, t["id"].(uint), ischeck, false)
+				healthcheck(db, quest8, t["id"].(int), ischeck, false)
 				return
 			}
 			defer resp.Body.Close()
@@ -83,12 +83,12 @@ func Git(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 				url, err := resp.Location()
 				if err != nil {
 					log.Println("[-]", err)
-					healthcheck(db, quest8, t["id"].(uint), ischeck, false)
+					healthcheck(db, quest8, t["id"].(int), ischeck, false)
 					return
 				}
-				healthcheck(db, quest8, t["id"].(uint), ischeck, url.Path == "/")
+				healthcheck(db, quest8, t["id"].(int), ischeck, url.Path == "/")
 			} else {
-				healthcheck(db, quest8, t["id"].(uint), ischeck, false)
+				healthcheck(db, quest8, t["id"].(int), ischeck, false)
 			}
 		}(team)
 	}

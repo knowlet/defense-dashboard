@@ -32,7 +32,7 @@ func Stack(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 				strings.NewReader(`{"output":{"id":"graphs_Container","property":"children"},"event":"interval"}`))
 			if err != nil {
 				log.Println("[-]", err) // cancel caught
-				healthcheck(db, quest4, t["id"].(uint), ischeck, false)
+				healthcheck(db, quest4, t["id"].(int), ischeck, false)
 				return
 			}
 			defer resp.Body.Close()
@@ -43,7 +43,7 @@ func Stack(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 				body, err := io.ReadAll(resp.Body)
 				if err != nil {
 					log.Println("[-]", err)
-					healthcheck(db, quest4, t["id"].(uint), ischeck, false)
+					healthcheck(db, quest4, t["id"].(int), ischeck, false)
 					return
 				}
 				json := string(body)
@@ -63,10 +63,10 @@ func Stack(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 				// deviation within 2 minutes
 				sub := now.Sub(tt).Minutes()
 				log.Println("[+] Time deviation", sub)
-				healthcheck(db, quest4, t["id"].(uint), ischeck, sub > -2 && sub < 2)
-				// healthcheck(db, quest4, t["id"].(uint), ischeck, dtime != "")
+				healthcheck(db, quest4, t["id"].(int), ischeck, sub > -2 && sub < 2)
+				// healthcheck(db, quest4, t["id"].(int), ischeck, dtime != "")
 			} else {
-				healthcheck(db, quest4, t["id"].(uint), ischeck, false)
+				healthcheck(db, quest4, t["id"].(int), ischeck, false)
 			}
 		}(team)
 	}
