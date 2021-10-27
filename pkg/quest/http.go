@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func request(method, url, hostname string, body io.Reader) (*http.Response, error) {
+func request(method, url, hostname string, body io.Reader, jar http.CookieJar) (*http.Response, error) {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 	req, _ := http.NewRequestWithContext(ctx, method, url, body)
@@ -23,6 +23,7 @@ func request(method, url, hostname string, body io.Reader) (*http.Response, erro
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
 		},
+		Jar: jar,
 	}
 	go func() {
 		time.Sleep(time.Second * 10)

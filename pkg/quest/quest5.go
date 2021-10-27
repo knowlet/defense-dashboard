@@ -52,7 +52,7 @@ func News(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 					http.MethodPost,
 					fmt.Sprintf("http://%s%s", t["ip"], path),
 					t["hostname"].(string),
-					strings.NewReader(data.Encode()))
+					strings.NewReader(data.Encode()), nil)
 				if err != nil {
 					log.Println(err) // cancel caught
 					srvDown(db, 5, t)

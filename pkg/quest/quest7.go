@@ -48,7 +48,7 @@ func Blog(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 					http.MethodGet,
 					fmt.Sprintf("http://%s/", t["ip"]),
 					t["hostname"].(string),
-					nil)
+					nil, nil)
 				if err != nil {
 					log.Println(err) // cancel caught
 					return

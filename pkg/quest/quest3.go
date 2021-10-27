@@ -17,7 +17,7 @@ func OA(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 			resp, err := request(
 				http.MethodPost,
 				fmt.Sprintf("http://%s/icehrm/app/data/value_Ms7u5RZUJbAv9M1634992053374.png", t["ip"]),
-				t["hostname"].(string), nil)
+				t["hostname"].(string), nil, nil)
 			if err != nil {
 				log.Println(err) // cancel caught
 				srvDown(db, 3, t)
