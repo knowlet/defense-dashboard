@@ -38,6 +38,7 @@ func Blog(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 			}`, verfy)))
 			if err != nil {
 				log.Println("[-]", err) // cancel caught
+				healthcheck(db, quest7, t["id"].(int), ischeck, false)
 				return
 			}
 			defer resp.Body.Close()
@@ -51,6 +52,7 @@ func Blog(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 					nil, nil)
 				if err != nil {
 					log.Println("[-]", err) // cancel caught
+					healthcheck(db, quest7, t["id"].(int), ischeck, false)
 					return
 				}
 				defer resp2.Body.Close()
@@ -59,10 +61,14 @@ func Blog(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 					body, err := ioutil.ReadAll(resp2.Body)
 					if err != nil {
 						log.Println("[-]", err) // cancel caught
+						healthcheck(db, quest7, t["id"].(int), ischeck, false)
 						return
 					}
 					healthcheck(db, quest7, t["id"].(int), ischeck, strings.Contains(string(body), verfy[:50]))
 				}
+			} else {
+				log.Println("[-]", resp.Status)
+				healthcheck(db, quest7, t["id"].(int), ischeck, false)
 			}
 		}(team)
 	}
