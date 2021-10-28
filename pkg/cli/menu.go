@@ -89,9 +89,25 @@ func Menu(db *gorm.DB, quit chan bool) {
 				break
 			}
 
+			// read quest
+			q := []model.Quest{}
+			if err := db.Find(&q).Error; err != nil {
+				fmt.Println("[-]", err)
+				break
+			}
+			// make quest opts
+			qs := []string{}
+			for _, q := range queryModel {
+				qs = append(qs, q.Name)
+			}
 			// Choose reason
 			reason := ""
-			prompt3 := &survey.Input{Message: "Why"}
+			prompt3 := &survey.Input{
+				Message: "Why",
+				Suggest: func(toComplete string) []string {
+					return qs
+				},
+			}
 			survey.AskOne(prompt3, &reason)
 
 			// Choose team
