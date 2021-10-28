@@ -56,9 +56,29 @@ func Stack(db *gorm.DB, data []map[string]interface{}, ischeck bool) {
 				log.Println("[+]", now)
 
 				dt := strings.Split(dtime, ":")
-				h, _ := strconv.Atoi(dt[0])
-				m, _ := strconv.Atoi(dt[1])
-				s, _ := strconv.Atoi(dt[2])
+				if len(dt) != 3 {
+					log.Println("[-]", "time format error")
+					healthcheck(db, quest4, t["id"].(int), ischeck, false)
+					return
+				}
+				h, err := strconv.Atoi(dt[0])
+				if err != err {
+					log.Println("[-]", "time format error")
+					healthcheck(db, quest4, t["id"].(int), ischeck, false)
+					return
+				}
+				m, err := strconv.Atoi(dt[1])
+				if err != err {
+					log.Println("[-]", "time format error")
+					healthcheck(db, quest4, t["id"].(int), ischeck, false)
+					return
+				}
+				s, err := strconv.Atoi(dt[2])
+				if err != err {
+					log.Println("[-]", "time format error")
+					healthcheck(db, quest4, t["id"].(int), ischeck, false)
+					return
+				}
 				tt := time.Date(now.Year(), now.Month(), now.Day(), h, m, s, 0, loc)
 				log.Println("[+]", tt)
 				// deviation within 2 minutes
