@@ -22,7 +22,7 @@ func main() {
 	// Set log to stderr
 	log.SetOutput(os.Stderr)
 
-	dsn := "host=localhost user=postgres password=hitcon-defense-2021 dbname=gorm port=5432 sslmode=disable TimeZone=Asia/Taipei"
+	dsn := "host=127.0.0.1 user=postgres password=hitcon-defense-2021 dbname=gorm port=5432 sslmode=disable TimeZone=Asia/Taipei"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		// Logger: logger.Default.LogMode(logger.Info),
 	})
