@@ -1,0 +1,40 @@
+name: Go compatibility
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  compile:
+    name: Build and vet (${{ matrix.toolchain }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain: [minimum, stable]
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      # Keep the declared minimum honest without recommending an old toolchain
+      # for deployment. The stable job checks the currently supported release.
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        if: matrix.toolchain == 'minimum'
+        with:
+          go-version-file: go.mod
+          cache: false
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        if: matrix.toolchain == 'stable'
+        with:
+          go-version: stable
+          cache: false
+      - name: Compile without starting the dashboard
+        run: go build -mod=readonly ./...
+      - name: Vet packages
+        run: go vet -mod=readonly ./...
+      - name: Check module files stayed unchanged
+        run: git diff --exit-code -- go.mod go.sum
