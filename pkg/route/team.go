@@ -19,7 +19,7 @@ func (h Controller) TeamHandler(c *gin.Context) {
 	team := model.Team{}
 	if err := h.DB.Preload("Events", func(db *gorm.DB) *gorm.DB {
 		return db.Order("created_at DESC")
-	}).First(&team, id).Error; err != nil {
+	}).First(&team, "id = ?", id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Team not found"})
 		return
 	}
