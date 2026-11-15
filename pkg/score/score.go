@@ -10,6 +10,8 @@ import (
 )
 
 func Scoring(db *gorm.DB, ticker, ticker2 *time.Ticker, quit chan bool) {
+	defer ticker.Stop()
+	defer ticker2.Stop()
 	// read data
 	q1 := helper.ReadQ1("data/quest1.csv")
 	q2 := helper.ReadQ1("data/quest2.csv")
@@ -34,7 +36,7 @@ func Scoring(db *gorm.DB, ticker, ticker2 *time.Ticker, quit chan bool) {
 			go quest.News(db, q5, false)
 
 		case <-quit:
-			ticker.Stop()
+			return
 		}
 	}
 }
