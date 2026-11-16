@@ -11,7 +11,11 @@ import (
 func request(method, url, hostname string, body io.Reader) (*http.Response, error) {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
-	req, _ := http.NewRequestWithContext(ctx, method, url, body)
+	req, err := http.NewRequestWithContext(ctx, method, url, body)
+	if err != nil {
+		cancel()
+		return nil, err
+	}
 	req.Host = hostname
 	if body != nil {
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -38,7 +42,11 @@ func request(method, url, hostname string, body io.Reader) (*http.Response, erro
 func reqjson(method, url, hostname string, body io.Reader) (*http.Response, error) {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
-	req, _ := http.NewRequestWithContext(ctx, method, url, body)
+	req, err := http.NewRequestWithContext(ctx, method, url, body)
+	if err != nil {
+		cancel()
+		return nil, err
+	}
 	req.Host = hostname
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{
